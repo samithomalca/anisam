@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANISAM - Control Emocional Inteligente & Entretenimiento</title>
+  <meta name="description" content="Una forma más inteligente de controlar tus emociones, sentimientos y encontrar entretenimiento instantáneo personalizado.">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Phosphor Icons & Chart.js -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-active-mood="relax">
+
+  <!-- Ambient Dynamic Lighting Orbs -->
+  <div class="ambient-bg">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="brand-logo" id="brand-logo-btn">
+        <div class="logo-icon">✨</div>
+        <div class="brand-text">
+          <h1>ANISAM</h1>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-target="screen-welcome">
+          <i class="ph ph-house"></i> Inicio
+        </button>
+        <button class="nav-btn" data-target="screen-mood-reg">
+          <i class="ph ph-smiley"></i> Registro
+        </button>
+        <button class="nav-btn" data-target="screen-recommendations">
+          <i class="ph ph-sparkle"></i> Recomendaciones
+        </button>
+        <button class="nav-btn" data-target="screen-user-panel">
+          <i class="ph ph-chart-polar"></i> Insights
+        </button>
+      </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER FOR THE 4 SCREENS -->
+    <main>
+
+      <!-- ===================================================================
+           PANTALLA 1: BIENVENIDA / INCORPORACIÓN (#screen-welcome)
+           =================================================================== -->
+      <section id="screen-welcome" class="screen active-screen">
+        <div class="hero-section">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <i class="ph ph-brain"></i> Sistema de Inteligencia Emocional
+            </div>
+            <h2>¿Cómo te sientes hoy?</h2>
+            <p class="hero-subtitle">
+              Una forma más inteligente de controlar tus emociones, sentimientos y encontrar entretenimiento instantáneo personalizado.
+            </p>
+            
+            <div class="hero-actions">
+              <!-- Required Button class and structure -->
+              <button class="ag-btn ag-btn-primary ag-btn-lg" id="btn-get-started">
+                Get Started <i class="ph ph-arrow-right"></i>
+              </button>
+              <button class="ag-btn ag-btn-secondary ag-btn-lg" onclick="document.querySelector('[data-target=\'screen-user-panel\']').click()">
+                <i class="ph ph-chart-line-up"></i> Ver Insights
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Visual Card Showcase -->
+          <div class="hero-visual">
+            <div class="glass-card-hero">
+              
+              <!-- Top Header: Active Mood Badge + Weekly Calendar Widget -->
+              <div class="hero-card-header">
+                <div class="hero-mood-badge-wrap">
+                  <span class="mood-badge-hero" id="hero-current-mood-badge">🧘 Estado Actual: Relax (8/10)</span>
+                </div>
+                
+                <!-- Weekly History Calendar Pill Grid -->
+                <div class="weekly-calendar-widget" id="weekly-calendar-widget">
+                  <!-- Rendered dynamically via JS -->
+                </div>
+              </div>
+
+              <div class="hero-mood-preview">
+                <h3>Música y Película Sugerida</h3>
+                
+                <div class="media-preview-mini">
+                  <img src="assets/chill_lofi_art.png" alt="Lofi cover" id="hero-song-img" />
+                  <div class="media-info-mini">
+                    <h5 id="hero-song-title">Zen Meditation & Lofi</h5>
+                    <p id="hero-song-desc">Mindful Soundscapes • 99% Match</p>
+                  </div>
+                </div>
+
+                <div class="media-preview-mini">
+                  <img src="assets/movie_poster_echoes.png" alt="Movie poster" id="hero-movie-img" />
+                  <div class="media-info-mini">
+                    <h5 id="hero-movie-title">Echoes of Calm</h5>
+                    <p id="hero-movie-desc">Cine Indie / Drama • 1h 45m</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Features Highlights -->
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ph ph-pulse"></i></div>
+            <h4>Detector Emocional</h4>
+            <p>Selecciona tu emoción o descríbela en tus propias palabras para un diagnóstico rápido.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ph ph-music-notes"></i></div>
+            <h4>Entretenimiento Vivo</h4>
+            <p>Obtén canciones, playlists y películas adaptadas exactamente a lo que sientes.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ph ph-calendar-check"></i></div>
+            <h4>Mood Journey</h4>
+            <p>Lleva una bitácora cronológica de tus variaciones anímicas y hábitos diarios.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PANTALLA 2: REGISTRO DE ESTADO DE ÁNIMO (#screen-mood-reg)
+           =================================================================== -->
+      <section id="screen-mood-reg" class="screen">
+        <div class="screen-header">
+          <h2>Registro de Estado de Ánimo</h2>
+          <p>¿Cómo te sientes en este instante? Elige tu emoción o escribe brevemente tus palabras clave.</p>
+        </div>
+
+        <div class="mood-selector-container">
+          
+          <!-- Emotional Grid Selector -->
+          <div class="mood-grid">
+            <div class="mood-card" data-mood="triste">
+              <span class="mood-emoji">😔</span>
+              <span class="mood-label">Triste</span>
+              <span class="mood-desc">Reflexivo o melancólico</span>
+            </div>
+            <div class="mood-card" data-mood="relax">
+              <span class="mood-emoji">🧘</span>
+              <span class="mood-label">Relax</span>
+              <span class="mood-desc">Sereno y equilibrado</span>
+            </div>
+            <div class="mood-card" data-mood="entretenido">
+              <span class="mood-emoji">🎬</span>
+              <span class="mood-label">Entretenido</span>
+              <span class="mood-desc">Curioso por diversión</span>
+            </div>
+            <div class="mood-card selected" data-mood="feliz">
+              <span class="mood-emoji">😊</span>
+              <span class="mood-label">Feliz</span>
+              <span class="mood-desc">Alegre y optimista</span>
+            </div>
+            <div class="mood-card" data-mood="energia">
+              <span class="mood-emoji">⚡</span>
+              <span class="mood-label">Con Energía</span>
+              <span class="mood-desc">Motivado y activo</span>
+            </div>
+          </div>
+
+          <!-- Intensity Rating Slider -->
+          <div class="intensity-section">
+            <div class="intensity-header">
+              <span class="intensity-label"><i class="ph ph-sliders"></i> Nivel de Intensidad Emocional</span>
+              <span class="intensity-value-badge" id="intensity-val">70/100</span>
+            </div>
+            <input type="range" min="0" max="100" value="70" class="intensity-slider" id="intensity-slider">
+          </div>
+
+          <!-- Free Text / Keyword NLP Field -->
+          <div class="nlp-input-section">
+            <div class="nlp-label">
+              <span><i class="ph ph-chat-teardrop-text"></i> Interpretación opcional mediante palabras clave</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Sugerencia automática por IA</span>
+            </div>
+            <textarea 
+              class="nlp-textarea" 
+              id="nlp-textarea"
+              placeholder="Ejemplo: Tuve un día pesado en el trabajo y solo quiero relajarme viendo una buena película..."
+            ></textarea>
+            <div class="nlp-detected-tags" id="detected-tags">
+              <!-- Live tags rendered here via JS -->
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="form-action-footer">
+            <button class="ag-btn ag-btn-primary ag-btn-lg" id="btn-get-recommendations">
+              <i class="ph ph-sparkle"></i> Obtener Recomendaciones
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PANTALLA 3: RESULTADOS Y RECOMENDACIONES (#screen-recommendations)
+           =================================================================== -->
+      <section id="screen-recommendations" class="screen">
+        
+        <!-- Recommendations Summary Header -->
+        <div class="recommendations-header-card">
+          <div class="active-mood-info">
+            <div class="active-mood-icon-circle" id="active-mood-icon">🧘</div>
+            <div class="active-mood-details">
+              <h3 id="active-mood-title">Modo Emocional: Relax</h3>
+              <p id="active-mood-desc">Intensidad: 7/10 • En paz, equilibrado y sereno</p>
+            </div>
+          </div>
+
+          <button class="ag-btn ag-btn-secondary ag-btn-sm" onclick="document.querySelector('[data-target=\'screen-mood-reg\']').click()">
+            <i class="ph ph-arrows-counter-clockwise"></i> Cambiar Ánimo
+          </button>
+        </div>
+
+        <!-- Quick Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="filter-tab-btn active" data-filter="all">✨ Todo</button>
+          <button class="filter-tab-btn" data-filter="music">🎵 Música</button>
+          <button class="filter-tab-btn" data-filter="movies">🎬 Películas</button>
+        </div>
+
+        <!-- 2-Column Layout Wrapper: Music (left) | Movies (right) -->
+        <div class="recs-two-col-layout" id="recs-two-col-layout">
+
+          <!-- Section 1: Music Recommendations Cards Grid -->
+          <div id="music-section-container" class="recs-col recs-col-music">
+            <h3 class="recs-section-title"><i class="ph ph-headphones"></i> Música y Lofi</h3>
+            <div class="media-grid media-grid-single-col" id="music-grid-container">
+              <!-- Music Cards populated via JS -->
+            </div>
+          </div>
+
+          <!-- Section 2: Cinema Recommendations Cards -->
+          <div id="cinema-section-container" class="recs-col recs-col-movies">
+            <h3 class="recs-section-title"><i class="ph ph-film-strip"></i> Películas Sugeridas</h3>
+            <div class="media-grid media-grid-single-col" id="media-grid-container">
+              <!-- Media Cards populated via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+          <button class="ag-btn ag-btn-primary ag-btn-lg" onclick="document.querySelector('[data-target=\'screen-user-panel\']').click()">
+            Ir a Mi Panel (Mood Journey) <i class="ph ph-arrow-right"></i>
+          </button>
+        </div>
+
+
+      </section>
+
+      <!-- ===================================================================
+           PANTALLA 4: PANEL DE USUARIO (#screen-user-panel)
+           =================================================================== -->
+      <section id="screen-user-panel" class="screen">
+        
+        <div class="screen-header" style="margin-bottom: 2rem;">
+          <h2>Panel de Usuario</h2>
+          <p>Supervisa tus tareas diarias para mantener el equilibrio y analiza tu evolución emocional.</p>
+        </div>
+
+        <div class="user-panel-grid">
+          
+          <!-- Sub-section: Tarea de Hoy (Daily Habits) -->
+          <div class="habits-container">
+            <div class="habits-header">
+              <h3><i class="ph ph-check-square-offset"></i> Tareas de Hoy</h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Balance Emocional</span>
+            </div>
+
+            <div class="habits-progress-bar">
+              <div class="habits-progress-fill" id="habits-progress-fill"></div>
+            </div>
+
+            <div class="habit-list" id="habit-list-container">
+              <!-- Habit checklist rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Sub-section: Mood Journey (Historial) -->
+          <div class="journey-container">
+            <div class="journey-header">
+              <h3><i class="ph ph-clock-counter-clockwise"></i> Mood Journey</h3>
+              <button class="ag-btn ag-btn-secondary ag-btn-sm" onclick="localStorage.removeItem('anisam_history'); state.history=[]; renderHistory(); renderInsights();">
+                Limpiar
+              </button>
+            </div>
+
+            <div class="timeline-list" id="timeline-list-container">
+              <!-- History timeline items rendered via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sub-section: Your Insights (Gráficos y Estadísticas) -->
+        <div class="insights-full-container">
+          <div class="insights-header">
+            <h3><i class="ph ph-chart-pie-slice"></i> Your Insights</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Estadísticas generales de tus emociones predominantes y contenido consumido.</p>
+          </div>
+
+          <div class="insights-charts-grid">
+            <div class="chart-card">
+              <h4>Distribución Emocional</h4>
+              <div class="chart-canvas-wrap">
+                <canvas id="donutChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <h4>Evolución de Intensidad</h4>
+              <div class="chart-canvas-wrap">
+                <canvas id="trendChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <h4>Índice de Balance</h4>
+              <div class="stat-summary-number" id="balance-score-val">88/100</div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">Excelente estabilidad emocional esta semana</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Trailer Preview Modal -->
+  <div class="modal-overlay" id="trailer-modal">
+    <div class="modal-box">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <h3 id="modal-media-title" style="font-family: var(--font-heading); margin-bottom: 1rem;">Tráiler de Película</h3>
+      <div style="background: rgba(0,0,0,0.5); height: 250px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; color: var(--text-muted);">
+        <i class="ph ph-play-circle" style="font-size: 3rem; color: var(--accent-primary);"></i>
+        <p>Vista previa del tráiler de alta definición</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application JS Data & Logic -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
