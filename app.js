@@ -370,7 +370,13 @@ function initMoodForm() {
       };
 
       state.history.unshift(newEntry);
-      localStorage.setItem('anisam_history', JSON.stringify(state.history));
+
+      // Persistencia: Appwrite si está disponible; si no, localStorage
+      if (window.AnisamBackend) {
+        window.AnisamBackend.onEntryAdded(newEntry);
+      } else {
+        localStorage.setItem('anisam_history', JSON.stringify(state.history));
+      }
 
       // Setup Today's Habits
       state.habits = currentMoodObj.habits.map(h => ({ ...h }));
@@ -686,6 +692,24 @@ function renderHabits() {
     state.habits = state.habits.map(h => h.id === id ? { ...h, done: !h.done } : h);
     renderHabits();
   };
+}
+
+// User Panel: Clear history (local + Appwrite)
+function clearHistory() {
+  const confirmed = window.confirm('¿Borrar todo tu historial de estados de ánimo? Esta acción no se puede deshacer.');
+  if (!confirmed) return;
+
+  state.history = [];
+
+  if (window.AnisamBackend) {
+    window.AnisamBackend.clearEntries();
+  } else {
+    localStorage.removeItem('anisam_history');
+  }
+
+  renderHistory();
+  renderInsights();
+  renderWeeklyCalendar();
 }
 
 // User Panel: Render History Timeline
