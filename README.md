@@ -32,11 +32,22 @@ Entra a <https://cloud.appwrite.io/console> y abre tu proyecto.
 
 ### 1. Plataforma (obligatorio para evitar errores CORS)
 
-`Overview` → **Add a platform** → **Web app**:
+`Overview` → **Add a platform** → **Web app**.
 
-- Hostname de desarrollo: `localhost`
-- Hostname de producción: el dominio donde publiques el sitio
-  (por ejemplo `samithomalca.github.io` si usas GitHub Pages, o tu dominio de Vercel/Netlify).
+> ⚠️ **El plan Free de Appwrite solo permite 1 plataforma web.** En este proyecto ya está
+> ocupada por `127.0.0.1` (desarrollo local), y `localhost` también está autorizado
+> automáticamente. **Antes de publicar** debes reemplazarla por el dominio final.
+
+Para reemplazarla:
+
+1. `Overview` → borra la plataforma actual (`127.0.0.1`).
+2. **Add a platform** → **Web app** → hostname del dominio final:
+   - GitHub Pages: `samithomalca.github.io`
+   - Vercel/Netlify: tu dominio, por ejemplo `anisam.vercel.app`
+   - Dominio propio: `tudominio.com` (sin `https://` ni barras)
+
+Si publicas en GitHub Pages y también quieres seguir probando en local, tendrás que
+alternar la plataforma cada vez, o pasar a un plan de pago para tener varias.
 
 ### 2. Autenticación con email
 
@@ -99,14 +110,18 @@ npx serve . -l 4321
 python -m http.server 5500
 ```
 
-Abre <http://localhost:4321> (o el puerto que uses). El dominio ya está autorizado en
-Appwrite, así que el login funcionará directamente.
+Abre <http://localhost:4321> (o el puerto que uses). `127.0.0.1` es la plataforma
+autorizada en Appwrite, así que el login funcionará directamente.
 
 ## Desplegar
 
-Publica los archivos en GitHub Pages, Vercel, Netlify o Appwrite Sites y agrega el
-dominio final como **Web platform** en Appwrite. No se necesita build ni variables de
-entorno: la configuración vive en `appwrite-config.js`.
+Publica los archivos en GitHub Pages, Vercel, Netlify o Appwrite Sites. No se necesita
+build ni variables de entorno: la configuración vive en `appwrite-config.js`.
+
+**Paso obligatorio antes de publicar:** en Appwrite, `Overview` → borra la plataforma
+`127.0.0.1` y agrega el hostname final como **Web app** (ver
+[sección 1](#1-plataforma-obligatorio-para-evitar-errores-cors)). Si no lo haces, la app
+cargará pero el login fallará por CORS.
 
 > **Seguridad:** el Project ID es público y es seguro incluirlo en el frontend.
 > Nunca agregues una **API key** secreta a estos archivos.
