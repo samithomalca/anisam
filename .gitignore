@@ -1,0 +1,14 @@
+# Vercel CLI
+.vercel/
+
+# Dependencias (el proyecto es estático, no las necesita)
+node_modules/
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+.vercel
