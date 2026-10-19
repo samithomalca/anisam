@@ -55,6 +55,30 @@ window.AnisamGuard.isUnlocked(); // true si hay sesión
 window.AnisamGuard.onChange((state, user) => { /* reaccionar al cambio */ });
 ```
 
+### 👁️ Mostrar / ocultar contraseña
+
+Los campos de contraseña (tanto en la pantalla de acceso como en el modal del navbar)
+tienen un **botón con icono de ojo** que alterna el tipo del campo:
+
+- **Oculto** → `type="password"` con icono `ph-eye` (ojo abierto).
+- **Visible** → `type="text"` con icono `ph-eye-slash` (ojo tachado).
+
+El botón incluye `aria-pressed` y `aria-label` que se actualizan dinámicamente
+("Mostrar contraseña" / "Ocultar contraseña"), y al enviar el formulario con éxito o al
+cerrar sesión vuelve automáticamente al estado oculto.
+
+Para añadir el toggle a otro campo, basta con envolverlo y marcar el botón:
+
+```html
+<div class="auth-input-wrap">
+  <input class="auth-input" id="mi-password" type="password">
+  <button class="auth-toggle-password" type="button" data-password-toggle="mi-password"
+          aria-label="Mostrar contraseña" aria-pressed="false">
+    <i class="ph ph-eye"></i>
+  </button>
+</div>
+```
+
 
 ### Archivos añadidos
 

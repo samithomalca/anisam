@@ -457,6 +457,7 @@
     setAuthMode('login');
     showError('', els.gateError);
     setGateBusy(false);
+    resetPasswordToggles();
   }
 
   function setGateBusy(busy) {
@@ -510,12 +511,70 @@
       }
       if (form) form.reset();
       if (closeFn) closeFn();
+      resetPasswordToggles();
     } catch (err) {
       console.error('[ANISAM] Error de autenticación:', err);
       showError(friendlyError(err), errorEl);
     } finally {
       busyFn(false);
     }
+  }
+
+  /**
+   * Alterna la visibilidad de un campo de contraseña y su icono (ojo / ojo tachado).
+   */
+  function togglePasswordVisibility(button) {
+    const inputId = button.getAttribute('data-password-toggle');
+    const input = inputId ? document.getElementById(inputId) : null;
+    if (!input) return;
+
+    const willShow = input.type === 'password';
+    input.type = willShow ? 'text' : 'password';
+
+    button.setAttribute('aria-pressed', willShow ? 'true' : 'false');
+    const label = willShow ? 'Ocultar contraseña' : 'Mostrar contraseña';
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
+
+    const icon = button.querySelector('i');
+    if (icon) {
+      icon.classList.toggle('ph-eye', !willShow);
+      icon.classList.toggle('ph-eye-slash', willShow);
+    }
+
+    // Mantiene el foco en el campo para no interrumpir la escritura
+    input.focus();
+  }
+
+  function wirePasswordToggles() {
+    const buttons = document.querySelectorAll('[data-password-toggle]');
+    buttons.forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        togglePasswordVisibility(button);
+      });
+    });
+  }
+
+  /**
+   * Restablece ambos campos de contraseña a estado oculto.
+   */
+  function resetPasswordToggles() {
+    document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+      const inputId = button.getAttribute('data-password-toggle');
+      const input = inputId ? document.getElementById(inputId) : null;
+      if (input) input.type = 'password';
+
+      button.setAttribute('aria-pressed', 'false');
+      button.setAttribute('aria-label', 'Mostrar contraseña');
+      button.setAttribute('title', 'Mostrar contraseña');
+
+      const icon = button.querySelector('i');
+      if (icon) {
+        icon.classList.add('ph-eye');
+        icon.classList.remove('ph-eye-slash');
+      }
+    });
   }
 
   function wireAuthUI() {
@@ -570,6 +629,8 @@
     cacheElements();
     gateEl = els.gate;
     wireAuthUI();
+    wirePasswordToggles();
+    resetPasswordToggles();
     updateAuthUI();
 
     if (!isConfigured) {
