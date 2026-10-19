@@ -45,15 +45,13 @@ Opcional: exige verificación de email si lo necesitas.
 
 ### 3. Base de datos y tabla
 
-`Databases` → **Create database**:
+> **Ya creadas en este proyecto.** El plan Free permite una sola base de datos, así que se
+> usa la existente **Production TablesDB**. Estos son los IDs reales:
 
-- Database ID: `anisam`
+- Database ID: `6ad644c7001212715993` (Production TablesDB)
+- Table ID: `6ad645330023c95ed756` (nombre `mood_entries`)
 
-Dentro de la base de datos, **Create table**:
-
-- Table ID: `mood_entries`
-
-Crea estas columnas:
+La tabla tiene estas columnas (todas requeridas y ya creadas):
 
 | Columna | Tipo | Tamaño | Requerida |
 | --- | --- | --- | --- |
@@ -79,9 +77,15 @@ solo puede ver su propio historial**.
 
 ### 5. Conectar el proyecto
 
-El `projectId` ya está configurado con `6abda2040008ae6691ea` y el endpoint global
-`https://cloud.appwrite.io/v1`. Si tu proyecto usa una región específica, copia el
-endpoint desde `Settings → Overview` (por ejemplo `https://nyc.cloud.appwrite.io/v1`).
+`appwrite-config.js` ya está configurado con:
+
+- Endpoint (región FRA): `https://fra.cloud.appwrite.io/v1`
+- Project ID: `6abda2040008ae6691ea`
+- Database ID: `6ad644c7001212715993`
+- Table ID: `6ad645330023c95ed756`
+
+Si cambias de proyecto o región, copia el endpoint desde `Settings → Overview` y
+actualiza esos cuatro valores.
 
 ---
 
@@ -90,13 +94,13 @@ endpoint desde `Settings → Overview` (por ejemplo `https://nyc.cloud.appwrite.
 El proyecto es estático. Sirve la carpeta con cualquier servidor HTTP:
 
 ```bash
-npx serve .
+npx serve . -l 4321
 # o
 python -m http.server 5500
 ```
 
-Abre <http://localhost:3000> (o el puerto que uses). Agrega `localhost` como plataforma
-en Appwrite antes de probar el login.
+Abre <http://localhost:4321> (o el puerto que uses). El dominio ya está autorizado en
+Appwrite, así que el login funcionará directamente.
 
 ## Desplegar
 

@@ -16,10 +16,10 @@
   // ------------------------------------------------------------------
   const CFG = Object.assign(
     {
-      endpoint: 'https://cloud.appwrite.io/v1',
+      endpoint: 'https://fra.cloud.appwrite.io/v1',
       projectId: '',
-      databaseId: 'anisam',
-      tableId: 'mood_entries'
+      databaseId: '6ad644c7001212715993',
+      tableId: '6ad645330023c95ed756'
     },
     window.ANISAM_APPWRITE_CONFIG || {}
   );

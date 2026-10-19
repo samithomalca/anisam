@@ -328,7 +328,7 @@ function initMoodForm() {
   if (nlpTextarea) {
     nlpTextarea.addEventListener('input', (e) => {
       const text = e.target.value.toLowerCase();
-      state.nlpText = text;
+      state.nlpText = e.target.value;
       
       const detectedKeywords = [];
       Object.keys(KEYWORD_MAP).forEach(kw => {

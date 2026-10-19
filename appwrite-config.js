@@ -10,14 +10,12 @@
  * aquí una API key secreta.
  */
 window.ANISAM_APPWRITE_CONFIG = {
-  // Ejemplo Cloud: 'https://cloud.appwrite.io/v1'
-  // Ejemplo región: 'https://nyc.cloud.appwrite.io/v1'
-  endpoint: 'https://cloud.appwrite.io/v1',
+  // Proyecto alojado en la región FRA (Frankfurt)
+  endpoint: 'https://fra.cloud.appwrite.io/v1',
 
-  // Ejemplo: '67a1b2c3d4e5f6a7b8c9'
   projectId: '6abda2040008ae6691ea',
 
   // Base de datos y tabla creadas en la consola de Appwrite
-  databaseId: 'anisam',
-  tableId: 'mood_entries'
+  databaseId: '6ad644c7001212715993',
+  tableId: '6ad645330023c95ed756'
 };
