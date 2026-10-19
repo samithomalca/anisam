@@ -79,12 +79,9 @@ solo puede ver su propio historial**.
 
 ### 5. Conectar el proyecto
 
-Abre `appwrite-config.js` y reemplaza:
-
-```js
-endpoint: 'https://cloud.appwrite.io/v1', // o tu endpoint regional
-projectId: 'TU_PROJECT_ID',               // Settings -> Overview
-```
+El `projectId` ya está configurado con `6abda2040008ae6691ea` y el endpoint global
+`https://cloud.appwrite.io/v1`. Si tu proyecto usa una región específica, copia el
+endpoint desde `Settings → Overview` (por ejemplo `https://nyc.cloud.appwrite.io/v1`).
 
 ---
 

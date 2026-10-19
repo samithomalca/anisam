@@ -15,7 +15,7 @@ window.ANISAM_APPWRITE_CONFIG = {
   endpoint: 'https://cloud.appwrite.io/v1',
 
   // Ejemplo: '67a1b2c3d4e5f6a7b8c9'
-  projectId: 'TU_PROJECT_ID',
+  projectId: '6abda2040008ae6691ea',
 
   // Base de datos y tabla creadas en la consola de Appwrite
   databaseId: 'anisam',
