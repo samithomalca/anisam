@@ -24,12 +24,44 @@ El frontend usa **Appwrite** como backend para:
 > Si Appwrite no está configurado, la app sigue funcionando en **modo invitado** con
 > `localStorage`.
 
+### 🔒 Control de acceso (Auth Guard)
+
+La aplicación está **bloqueada hasta iniciar sesión**. Internamente usa tres estados que se
+reflejan en el atributo `data-auth-state` del `<body>`:
+
+| Estado | Qué se ve |
+| --- | --- |
+| `loading` | Nada (se está comprobando la sesión con Appwrite) |
+| `locked` | Solo la **pantalla de acceso** (`#auth-gate`). El dashboard queda oculto. |
+| `unlocked` | El dashboard completo, en la pantalla de inicio |
+
+Comportamiento:
+
+- **Sin sesión activa** → se muestra únicamente el formulario de login/registro con el
+  fondo bloqueado. La navegación del dashboard y el modal del navbar quedan deshabilitados
+  (`switchScreen` se ignora mientras el guard esté bloqueado).
+- **Al registrarse o iniciar sesión** → se desbloquea y entra automáticamente al inicio.
+- **Al pulsar "Salir"** → se cierra la sesión en Appwrite, se limpia el formulario y se
+  vuelve a bloquear la pantalla.
+- **Al recargar la página** con una sesión válida → se entra directamente al dashboard, sin
+  parpadeo del contenido.
+
+Desde el código puedes consultarlo con `window.AnisamGuard`:
+
+```js
+window.AnisamGuard.getState();   // 'loading' | 'locked' | 'unlocked'
+window.AnisamGuard.isLocked();   // true si no hay sesión
+window.AnisamGuard.isUnlocked(); // true si hay sesión
+window.AnisamGuard.onChange((state, user) => { /* reaccionar al cambio */ });
+```
+
+
 ### Archivos añadidos
 
 | Archivo | Descripción |
 | --- | --- |
 | `appwrite-config.js` | Endpoint, Project ID, base de datos y tabla. **Aquí pegas tus datos.** |
-| `appwrite.js` | Cliente de Appwrite, login/registro y sincronización del historial. |
+| `appwrite.js` | Cliente de Appwrite, login/registro, **Auth Guard** y sincronización del historial. |
 | `vercel.json` | Configuración de despliegue en Vercel (sin build, headers, URLs limpias). |
 
 El SDK se carga por CDN (`appwrite@29`) y la UI de cuenta se agregó al navbar y en un

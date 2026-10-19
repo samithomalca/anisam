@@ -13,7 +13,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body data-active-mood="relax">
+<body data-active-mood="relax" data-auth-state="loading">
 
   <!-- Ambient Dynamic Lighting Orbs -->
   <div class="ambient-bg">
@@ -21,7 +21,7 @@
     <div class="ambient-orb ambient-orb-2"></div>
   </div>
 
-  <div class="app-container">
+  <div class="app-container" id="app-shell">
     
     <!-- Top Navigation Bar -->
     <header class="navbar">
@@ -358,6 +358,53 @@
       </section>
 
     </main>
+  </div>
+
+  <!-- Auth Guard: pantalla de bloqueo (se muestra mientras no hay sesión) -->
+  <div class="auth-gate" id="auth-gate" role="dialog" aria-modal="true" aria-labelledby="auth-gate-title" hidden>
+    <div class="auth-gate-backdrop"></div>
+    <div class="auth-gate-box">
+      <div class="auth-gate-brand">
+        <div class="logo-icon">✨</div>
+        <span>ANISAM</span>
+      </div>
+      <h2 id="auth-gate-title">Acceso privado</h2>
+      <p class="auth-gate-subtitle">
+        Inicia sesión o crea tu cuenta para entrar. Tu historial emocional es privado:
+        solo tu cuenta puede verlo.
+      </p>
+
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" type="button" data-auth-tab="login" role="tab">Iniciar sesión</button>
+        <button class="auth-tab" type="button" data-auth-tab="register" role="tab">Crear cuenta</button>
+      </div>
+
+      <form id="auth-gate-form" novalidate>
+        <div class="auth-field" id="auth-gate-name-field" hidden>
+          <label for="auth-gate-name">Nombre</label>
+          <input class="auth-input" id="auth-gate-name" name="name" type="text" autocomplete="name" placeholder="Tu nombre">
+        </div>
+        <div class="auth-field">
+          <label for="auth-gate-email">Email</label>
+          <input class="auth-input" id="auth-gate-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" required>
+        </div>
+        <div class="auth-field">
+          <label for="auth-gate-password">Contraseña</label>
+          <input class="auth-input" id="auth-gate-password" name="password" type="password" autocomplete="current-password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+        </div>
+
+        <p class="auth-error" id="auth-gate-error" role="alert"></p>
+
+        <button class="ag-btn ag-btn-primary auth-submit" id="auth-gate-submit" type="submit">Entrar</button>
+
+        <p class="auth-hint" id="auth-gate-hint" hidden>
+          Falta configurar Appwrite: agrega tu <strong>Project ID</strong> en <code>appwrite-config.js</code>.
+        </p>
+        <p class="auth-hint">
+          Tus registros son privados: solo tu cuenta puede leerlos.
+        </p>
+      </form>
+    </div>
   </div>
 
   <!-- Auth Modal (Appwrite: email + password) -->

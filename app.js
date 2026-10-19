@@ -225,6 +225,11 @@ function renderWeeklyCalendar() {
 
 // Navigation Controller (SPA Views Switcher)
 function switchScreen(screenId) {
+  // Auth Guard: sin sesión no se puede navegar por el dashboard
+  if (window.AnisamGuard && window.AnisamGuard.isLocked()) {
+    return;
+  }
+
   state.activeScreen = screenId;
   
   const screens = document.querySelectorAll('.screen');
@@ -246,6 +251,9 @@ function switchScreen(screenId) {
     renderHabits();
   }
 }
+
+// Expone el controlador de pantallas para el Auth Guard (appwrite.js)
+window.switchScreen = switchScreen;
 
 function initNavigation() {
   const navBtns = document.querySelectorAll('.nav-btn');

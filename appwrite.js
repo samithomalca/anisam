@@ -38,6 +38,11 @@
   let tablesDB = null;
   let user = null; // sesión activa de Appwrite (null = invitado)
 
+  // Auth Guard
+  let authState = 'loading';   // 'loading' | 'locked' | 'unlocked'
+  let gateEl = null;           // contenedor #auth-gate
+  let gateMode = 'login';      // pestaña activa dentro de la pantalla de acceso
+
   if (isConfigured) {
     client = new SDK.Client().setEndpoint(CFG.endpoint).setProject(CFG.projectId);
     account = new SDK.Account(client);
@@ -190,6 +195,54 @@
   // ------------------------------------------------------------------
   // Autenticación
   // ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Auth Guard: estado de acceso (loading -> locked -> unlocked)
+  // ------------------------------------------------------------------
+  var authListener = null;
+
+  /**
+   * Aplica el estado de acceso a toda la app.
+   * - 'loading'  : aún comprobando la sesión (no se ve nada)
+   * - 'locked'   : sin sesión -> solo se ve la pantalla de acceso
+   * - 'unlocked' : con sesión -> se ve el dashboard
+   */
+  function setAuthState(nextState) {
+    authState = nextState;
+    document.body.setAttribute('data-auth-state', nextState);
+
+    if (gateEl) gateEl.hidden = nextState !== 'locked';
+
+    if (nextState === 'locked') {
+      document.body.classList.add('auth-locked');
+      focusGate();
+    } else {
+      document.body.classList.remove('auth-locked');
+    }
+
+    if (nextState === 'unlocked') {
+      // Al entrar, llevar al dashboard (no a pantallas intermedias)
+      if (typeof window.switchScreen === 'function') {
+        window.switchScreen('screen-welcome');
+      } else if (typeof switchScreen === 'function') {
+        switchScreen('screen-welcome');
+      }
+    }
+
+    if (typeof authListener === 'function') {
+      try { authListener(nextState, user); } catch (err) { /* noop */ }
+    }
+  }
+
+  function focusGate() {
+    // Enfoca el primer campo vacío de la pantalla de acceso
+    window.setTimeout(function () {
+      if (authState !== 'locked') return;
+      var target = gateMode === 'login' ? els.gateEmail : els.gateName;
+      if (!target) target = els.gateEmail;
+      if (target) target.focus();
+    }, 60);
+  }
+
   async function register(name, email, password) {
     await account.create({
       userId: SDK.ID.unique(),
@@ -209,7 +262,13 @@
   async function adoptSession() {
     user = await account.get();
     updateAuthUI();
-    await syncWithRemote({ importGuest: true });
+    // Desbloquea la app inmediatamente; la sincronización sigue en segundo plano
+    setAuthState('unlocked');
+    try {
+      await syncWithRemote({ importGuest: true });
+    } catch (err) {
+      console.warn('[ANISAM] No se pudo sincronizar con Appwrite.', err);
+    }
   }
 
   async function logout() {
@@ -220,7 +279,36 @@
     }
     user = null;
     updateAuthUI();
+    // Limpia la caché del usuario y vuelve a bloquear la app
     emitChange(readCache(GUEST_CACHE_KEY));
+    resetGateForm();
+    setAuthState('locked');
+  }
+
+  async function checkSession() {
+    if (!isConfigured) {
+      // Sin backend no hay autenticación posible: se deja pasar en modo invitado.
+      updateAuthUI();
+      setAuthState('unlocked');
+      return null;
+    }
+    try {
+      user = await account.get();
+      updateAuthUI();
+      setAuthState('unlocked');
+      try {
+        await syncWithRemote({ importGuest: true });
+      } catch (err) {
+        console.warn('[ANISAM] No se pudo sincronizar con Appwrite.', err);
+      }
+      return user;
+    } catch (err) {
+      // 401 = no hay sesión válida -> pantalla de acceso
+      user = null;
+      updateAuthUI();
+      setAuthState('locked');
+      return null;
+    }
   }
 
   // ------------------------------------------------------------------
@@ -265,11 +353,12 @@
     login: login,
     register: register,
     logout: logout,
+    checkSession: checkSession,
     getUser: function () { return user; }
   };
 
   // ------------------------------------------------------------------
-  // Interfaz de autenticación (modal + navbar)
+  // Interfaz de autenticación (pantalla de acceso + modal + navbar)
   // ------------------------------------------------------------------
   const els = {};
 
@@ -288,34 +377,65 @@
     els.error = document.getElementById('auth-error');
     els.submit = document.getElementById('auth-submit');
     els.hint = document.getElementById('auth-config-hint');
+
+    // Pantalla de bloqueo (Auth Guard)
+    els.gate = document.getElementById('auth-gate');
+    els.gateForm = document.getElementById('auth-gate-form');
+    els.gateNameField = document.getElementById('auth-gate-name-field');
+    els.gateName = document.getElementById('auth-gate-name');
+    els.gateEmail = document.getElementById('auth-gate-email');
+    els.gatePassword = document.getElementById('auth-gate-password');
+    els.gateError = document.getElementById('auth-gate-error');
+    els.gateSubmit = document.getElementById('auth-gate-submit');
+    els.gateHint = document.getElementById('auth-gate-hint');
+
+    // Pestañas de ambos formularios
     els.tabs = document.querySelectorAll('[data-auth-tab]');
   }
 
-  let authMode = 'login';
+  let authMode = 'login'; // 'login' | 'register' (comparten estado)
 
+  /**
+   * Cambia entre "Iniciar sesión" y "Crear cuenta" en los dos formularios.
+   */
   function setAuthMode(mode) {
     authMode = mode;
+    gateMode = mode;
+
     els.tabs.forEach(function (tab) {
       tab.classList.toggle('active', tab.dataset.authTab === mode);
     });
+
+    // Formulario de la pantalla de acceso
+    if (els.gateNameField) els.gateNameField.hidden = mode !== 'register';
+    if (els.gateName) els.gateName.required = mode === 'register';
+    if (els.gateSubmit) {
+      els.gateSubmit.textContent = mode === 'register' ? 'Crear cuenta' : 'Entrar';
+    }
+
+    // Modal del navbar
     if (els.nameField) els.nameField.hidden = mode !== 'register';
     if (els.nameInput) els.nameInput.required = mode === 'register';
     if (els.submit) {
       els.submit.textContent = mode === 'register' ? 'Crear cuenta' : 'Entrar';
     }
-    showError('');
+
+    showError('', els.error);
+    showError('', els.gateError);
   }
 
-  function showError(message) {
-    if (!els.error) return;
-    els.error.textContent = message || '';
+  function showError(message, target) {
+    const el = target || els.error;
+    if (!el) return;
+    el.textContent = message || '';
   }
 
   function openModal() {
     if (!isConfigured) return;
+    if (authState === 'locked') return; // el guard manda: no se abre el modal
     if (els.form) els.form.reset();
     setAuthMode('login');
-    showError('');
+    showError('', els.error);
     els.modal.classList.add('active');
     if (els.emailInput) els.emailInput.focus();
   }
@@ -330,6 +450,23 @@
     if (els.chipLabel) els.chipLabel.textContent = loggedIn ? (user.email || user.name || 'Mi cuenta') : '';
     if (els.openBtn) els.openBtn.hidden = loggedIn;
     if (els.logoutBtn) els.logoutBtn.hidden = !loggedIn;
+  }
+
+  function resetGateForm() {
+    if (els.gateForm) els.gateForm.reset();
+    setAuthMode('login');
+    showError('', els.gateError);
+    setGateBusy(false);
+  }
+
+  function setGateBusy(busy) {
+    if (!els.gateSubmit) return;
+    els.gateSubmit.disabled = busy;
+    els.gateSubmit.textContent = busy
+      ? 'Conectando…'
+      : authMode === 'register'
+        ? 'Crear cuenta'
+        : 'Entrar';
   }
 
   function setBusy(busy) {
@@ -355,6 +492,32 @@
     return message;
   }
 
+  /**
+   * Ejecuta login/registro y gestiona el estado de los dos formularios.
+   */
+  async function submitAuth(form, errorEl, busyFn, closeFn, values) {
+    const email = (values.email || '').trim();
+    const password = values.password || '';
+    const name = (values.name || '').trim();
+
+    showError('', errorEl);
+    busyFn(true);
+    try {
+      if (authMode === 'register') {
+        await register(name, email, password);
+      } else {
+        await login(email, password);
+      }
+      if (form) form.reset();
+      if (closeFn) closeFn();
+    } catch (err) {
+      console.error('[ANISAM] Error de autenticación:', err);
+      showError(friendlyError(err), errorEl);
+    } finally {
+      busyFn(false);
+    }
+  }
+
   function wireAuthUI() {
     if (els.openBtn) els.openBtn.addEventListener('click', openModal);
     if (els.closeBtn) els.closeBtn.addEventListener('click', closeModal);
@@ -368,42 +531,44 @@
         logout();
       });
     }
+
+    // Pestañas (afectan a ambos formularios)
     els.tabs.forEach(function (tab) {
       tab.addEventListener('click', function () {
         setAuthMode(tab.dataset.authTab);
       });
     });
-    if (els.form) {
-      els.form.addEventListener('submit', async function (event) {
+
+    // Pantalla de acceso (Auth Guard)
+    if (els.gateForm) {
+      els.gateForm.addEventListener('submit', function (event) {
         event.preventDefault();
         if (!isConfigured) return;
+        submitAuth(els.gateForm, els.gateError, setGateBusy, null, {
+          email: els.gateEmail ? els.gateEmail.value : '',
+          password: els.gatePassword ? els.gatePassword.value : '',
+          name: els.gateName ? els.gateName.value : ''
+        });
+      });
+    }
 
-        const email = (els.emailInput.value || '').trim();
-        const password = els.passwordInput.value || '';
-        const name = (els.nameInput.value || '').trim();
-
-        showError('');
-        setBusy(true);
-        try {
-          if (authMode === 'register') {
-            await register(name, email, password);
-          } else {
-            await login(email, password);
-          }
-          closeModal();
-          els.form.reset();
-        } catch (err) {
-          console.error('[ANISAM] Error de autenticación:', err);
-          showError(friendlyError(err));
-        } finally {
-          setBusy(false);
-        }
+    // Modal del navbar
+    if (els.form) {
+      els.form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!isConfigured) return;
+        submitAuth(els.form, els.error, setBusy, closeModal, {
+          email: els.emailInput ? els.emailInput.value : '',
+          password: els.passwordInput ? els.passwordInput.value : '',
+          name: els.nameInput ? els.nameInput.value : ''
+        });
       });
     }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     cacheElements();
+    gateEl = els.gate;
     wireAuthUI();
     updateAuthUI();
 
@@ -413,21 +578,29 @@
         els.openBtn.title = 'Configura tu Project ID en appwrite-config.js';
       }
       if (els.hint) els.hint.hidden = false;
+      if (els.gateHint) els.gateHint.hidden = false;
+      // Sin Appwrite la app queda en modo invitado (no se puede autenticar).
+      setAuthState('unlocked');
       return;
     }
-    if (els.hint) els.hint.hidden = true;
 
-    // Restaurar sesión existente (si hay)
-    account
-      .get()
-      .then(function (current) {
-        user = current;
-        updateAuthUI();
-        return syncWithRemote({ importGuest: true });
-      })
-      .catch(function () {
-        user = null;
-        updateAuthUI();
-      });
+    if (els.hint) els.hint.hidden = true;
+    if (els.gateHint) els.gateHint.hidden = true;
+
+    // Aplica el estado 'loading' y comprueba la sesión existente
+    setAuthState('loading');
+    checkSession();
   });
+
+  // ------------------------------------------------------------------
+  // API pública (incluye el guard para app.js / index.html)
+  // ------------------------------------------------------------------
+  window.AnisamGuard = {
+    getState: function () { return authState; },
+    isLocked: function () { return authState === 'locked'; },
+    isUnlocked: function () { return authState === 'unlocked'; },
+    onChange: function (fn) { authListener = fn; },
+    lock: function () { setAuthState('locked'); },
+    unlock: function () { setAuthState('unlocked'); }
+  };
 })();
