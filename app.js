@@ -184,7 +184,7 @@ function renderWeeklyCalendar() {
 
   // Update hero mini preview cards
   if (songTitleEl) songTitleEl.textContent = topSong.title;
-  if (songDescEl) songDescEl.textContent = `${topSong.artist || topSong.genre} • ${topSong.match || '99% Match'}`;
+  if (songDescEl) songDescEl.textContent = `${topSong.artist || topSong.genre} • ${topSong.match || '99%'} de afinidad`;
   if (songImgEl && MOOD_COVERS[topSong.mood || currentMoodObj.label]) {
     songImgEl.src = MOOD_COVERS[topSong.mood || currentMoodObj.label];
   }
@@ -475,7 +475,7 @@ function renderRecommendations() {
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)}${yearText}</h4>
-              <span class="match-badge-inline">${matchPct} Match</span>
+              <span class="match-badge-inline">${matchPct} de afinidad</span>
             </div>
 
             <div class="media-meta-tags">
@@ -517,7 +517,7 @@ function renderRecommendations() {
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)} (${m.year || 2023})</h4>
-              <span class="match-badge-inline">${m.match || '96%'} Match</span>
+              <span class="match-badge-inline">${m.match || '96%'} de afinidad</span>
             </div>
 
             <div class="media-meta-tags">
