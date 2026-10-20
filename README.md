@@ -12,6 +12,34 @@ Aplicación web interactiva para la autogestión y el seguimiento del bienestar 
   cabeceras de seguridad).
 - Plataforma autorizada en Appwrite: `anisam-taupe.vercel.app`
 
+## 🖼️ Imágenes y portadas
+
+Todas las portadas son **SVG locales** guardados en `assets/`: no dependen de ninguna red
+externa, así que nunca aparecen rotas ni con enlaces caídos.
+
+| Archivo | Uso |
+| --- | --- |
+| `assets/fallback-cover.svg` | Portada de respaldo (marca ANISAM) para cualquier imagen que falle |
+| `assets/chill_lofi_art.svg` | Música relajante y lofi |
+| `assets/happy_series_poster.svg` | Contenido alegre (estado *Feliz*) |
+| `assets/energetic_synth_art.svg` | Contenido energético (estado *Con Energía*) |
+| `assets/movie_poster_echoes.svg` | Contenido emotivo / drama (estado *Triste*) |
+| `assets/happy_series_art.svg` | Entretenimiento (estado *Entretenido*) |
+
+### Respaldo automático ante fallos
+
+Cada `<img>` de portada lleva `data-fallback="assets/fallback-cover.svg"`. Un manejador global
+(`initImageFallbacks()` en `app.js`) escucha el evento `error` en fase de **captura** y:
+
+1. Sustituye la imagen rota por la portada de respaldo (`fallback-cover.svg`).
+2. Si la de respaldo también fallara, oculta la imagen y se muestra el degradado decorativo
+   de la tarjeta (nunca el icono de imagen rota).
+
+Además se aplica `loading="lazy"` y `decoding="async"` para que las tarjetas carguen con fluidez.
+
+Para añadir una portada nueva, basta con colocar el SVG en `assets/` y referenciarlo desde
+`data.js` (`poster`) o desde `MOOD_COVERS` en `app.js`.
+
 ## Integración con Appwrite
 
 El frontend usa **Appwrite** como backend para:
@@ -86,6 +114,7 @@ Para añadir el toggle a otro campo, basta con envolverlo y marcar el botón:
 | --- | --- |
 | `appwrite-config.js` | Endpoint, Project ID, base de datos y tabla. **Aquí pegas tus datos.** |
 | `appwrite.js` | Cliente de Appwrite, login/registro, **Auth Guard** y sincronización del historial. |
+| `assets/*.svg` | Portadas e ilustraciones locales, incluida la de respaldo. |
 | `vercel.json` | Configuración de despliegue en Vercel (sin build, headers, URLs limpias). |
 
 El SDK se carga por CDN (`appwrite@29`) y la UI de cuenta se agregó al navbar y en un

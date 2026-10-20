@@ -39,13 +39,41 @@ function getMoodFromIntensity(val) {
 }
 
 // Helper Cover Asset per Mood
+// Portadas locales (SVG dentro de /assets): nunca dependen de la red externa.
+const FALLBACK_COVER = 'assets/fallback-cover.svg';
+
 const MOOD_COVERS = {
-  Feliz: 'assets/happy_series_poster.png',
-  Triste: 'assets/movie_poster_echoes.png',
-  Energia: 'assets/energetic_synth_art.png',
-  Relax: 'assets/chill_lofi_art.png',
-  Entretenido: 'assets/happy_series_poster.png'
+  Feliz: 'assets/happy_series_poster.svg',
+  Triste: 'assets/movie_poster_echoes.svg',
+  Energia: 'assets/energetic_synth_art.svg',
+  Relax: 'assets/chill_lofi_art.svg',
+  Entretenido: 'assets/happy_series_art.svg'
 };
+
+/**
+ * Resuelve la portada de un elemento (canción o película).
+ * Si ya trae `poster` se respeta; si no, se usa la portada del estado de ánimo.
+ * Siempre devuelve una URL local válida (nunca cadena vacía).
+ */
+function resolveCover(item, moodKey) {
+  const label = (moodKey || 'Relax');
+  // Normaliza etiquetas tipo "Con Energía" -> "Energia"
+  const normalized = label === 'Con Energía' ? 'Energia' : label;
+  return (item && (item.poster || item.cover))
+    || MOOD_COVERS[normalized]
+    || MOOD_COVERS[label]
+    || FALLBACK_COVER;
+}
+
+/**
+ * Devuelve los atributos <img> para una portada, con respaldo ante fallos.
+ * La portada real se toma de `url` (o del respaldo si falta).
+ */
+function coverImgAttrs(url, alt) {
+  const safeUrl = url || FALLBACK_COVER;
+  const safeAlt = alt || 'Portada de contenido';
+  return `src="${safeUrl}" data-fallback="${FALLBACK_COVER}" alt="${escapeHtml(safeAlt)}" loading="lazy" decoding="async"`;
+}
 
 // Emotional Dataset Configuration & Daily Habits
 const MOOD_DATA = {
@@ -139,6 +167,7 @@ const DEFAULT_WEEKLY_LOGS = [
 
 // Application Bootstrapper
 document.addEventListener('DOMContentLoaded', () => {
+  initImageFallbacks();
   initNavigation();
   initMoodForm();
   initMediaGridEvents();
@@ -182,17 +211,17 @@ function renderWeeklyCalendar() {
     badgeEl.textContent = `${currentMoodObj.emoji} Estado Actual: ${currentMoodObj.label} (${Math.round(state.intensity / 10)}/10)`;
   }
 
-  // Update hero mini preview cards
+  // Update hero mini preview cards (con portada local + respaldo ante fallos)
   if (songTitleEl) songTitleEl.textContent = topSong.title;
   if (songDescEl) songDescEl.textContent = `${topSong.artist || topSong.genre} • ${topSong.match || '99%'} de afinidad`;
-  if (songImgEl && MOOD_COVERS[topSong.mood || currentMoodObj.label]) {
-    songImgEl.src = MOOD_COVERS[topSong.mood || currentMoodObj.label];
+  if (songImgEl) {
+    setCover(songImgEl, resolveCover(topSong, topSong.mood || currentMoodObj.label), topSong.title || 'Portada musical');
   }
 
   if (movieTitleEl) movieTitleEl.textContent = topMovie.title || topMovie.titulo;
   if (movieDescEl) movieDescEl.textContent = `${topMovie.genre || 'Cine'} • ${topMovie.duration || '2h'}`;
-  if (movieImgEl && MOOD_COVERS[topMovie.mood || currentMoodObj.label]) {
-    movieImgEl.src = MOOD_COVERS[topMovie.mood || currentMoodObj.label];
+  if (movieImgEl) {
+    setCover(movieImgEl, resolveCover(topMovie, topMovie.mood || currentMoodObj.label), topMovie.title || topMovie.titulo || 'Póster de película');
   }
 
   // Render weekly pills widget
@@ -469,9 +498,14 @@ function renderRecommendations() {
       const albumText = s.album || 'Álbum / Sencillo';
       const vibeText = s.vibe || s.mood || 'Vibra Emocional';
       const descText = s.description || 'Una pista seleccionada especialmente para tu estado de ánimo actual.';
+      const coverUrl = resolveCover(s, s.mood || state.selectedMood);
 
       return `
         <div class="media-card">
+          <div class="media-card-cover">
+            <img ${coverImgAttrs(coverUrl, titleText)} />
+            <span class="media-card-cover-badge">🎵 Música</span>
+          </div>
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)}${yearText}</h4>
@@ -511,9 +545,14 @@ function renderRecommendations() {
       const directorText = m.director || 'No especificado';
       const actorsText = m.actors || 'Elenco estelar';
       const themeText = m.theme || m.genre || 'Entretenimiento';
+      const coverUrl = resolveCover(m, m.mood || state.selectedMood);
 
       return `
         <div class="media-card">
+          <div class="media-card-cover">
+            <img ${coverImgAttrs(coverUrl, titleText)} />
+            <span class="media-card-cover-badge">🎬 Película</span>
+          </div>
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)} (${m.year || 2023})</h4>
@@ -580,6 +619,94 @@ function escapeAttr(str) {
     .replace(/'/g, '&#39;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+// ==========================================================================
+// Imágenes y portadas: carga segura con respaldo elegante
+// ==========================================================================
+
+/**
+ * Asigna una portada a un <img> y garantiza que, si falla la carga,
+ * se muestre automáticamente la portada de respaldo (SVG local).
+ */
+function setCover(imgEl, url, alt) {
+  if (!imgEl) return;
+  const safeUrl = url || FALLBACK_COVER;
+  const safeAlt = alt || 'Portada de contenido';
+
+  imgEl.setAttribute('loading', 'lazy');
+  imgEl.setAttribute('decoding', 'async');
+  if (safeAlt) imgEl.alt = safeAlt;
+  imgEl.dataset.fallback = FALLBACK_COVER;
+
+  // Si la URL cambia respecto a la actual, reinicia el estado de error
+  if (imgEl.getAttribute('src') !== safeUrl) {
+    imgEl.classList.remove('img-loading', 'img-failed');
+    imgEl.classList.add('img-loading');
+    imgEl.removeAttribute('data-failed');
+    imgEl.src = safeUrl;
+  }
+}
+
+/**
+ * Manejador global para <img>: si una imagen no carga (red externa caída,
+ * archivo ausente, etc.) se reemplaza por la portada de respaldo. Si la de
+ * respaldo también fallara, se oculta y se marca como fallida para que el
+ * contenedor muestre su fondo decorativo.
+ */
+function handleImageError(img) {
+  if (!img || img.dataset.failed === 'true') {
+    // La imagen de respaldo tampoco cargó: se oculta limpiamente.
+    if (img) {
+      img.classList.add('img-failed');
+      img.classList.remove('img-loading');
+      img.style.visibility = 'hidden';
+      img.setAttribute('aria-hidden', 'true');
+    }
+    return;
+  }
+
+  img.dataset.failed = 'true';
+  const fallback = img.dataset.fallback || FALLBACK_COVER;
+
+  if (img.getAttribute('src') !== fallback) {
+    img.src = fallback;
+  } else {
+    // Ya era la de respaldo y falló: se oculta sin mostrar el icono roto.
+    img.classList.add('img-failed');
+    img.classList.remove('img-loading');
+    img.style.visibility = 'hidden';
+    img.setAttribute('aria-hidden', 'true');
+  }
+}
+
+/**
+ * Activa el manejo de errores de imágenes de forma global (delegación por
+ * eventos en fase de captura, ya que "error" no burbujea).
+ */
+function initImageFallbacks() {
+  document.addEventListener(
+    'error',
+    function (event) {
+      const target = event.target;
+      if (target && target.tagName === 'IMG') {
+        handleImageError(target);
+      }
+    },
+    true // captura: imprescindible para el evento 'error' de las imágenes
+  );
+
+  // Marca como cargadas las que ya lo estén y quita el estado "loading"
+  document.addEventListener(
+    'load',
+    function (event) {
+      const target = event.target;
+      if (target && target.tagName === 'IMG') {
+        target.classList.remove('img-loading', 'img-failed');
+      }
+    },
+    true
+  );
 }
 
 // Audio Synthesizer Controls

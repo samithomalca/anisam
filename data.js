@@ -124,270 +124,270 @@ const songsCatalog = [
 const moviesCatalog = [
   // FELIZ (Películas)
   { 
-    title: "Amigos (Intouchables)", titulo: "Amigos (Intouchables)", type: "movie", genre: "Comedia / Drama", year: 2011, duration: "1h 52m", mood: "Feliz", match: "99%", poster: "assets/happy_series_poster.png",
+    title: "Amigos (Intouchables)", titulo: "Amigos (Intouchables)", type: "movie", genre: "Comedia / Drama", year: 2011, duration: "1h 52m", mood: "Feliz", match: "99%", poster: "assets/happy_series_poster.svg",
     director: "Olivier Nakache, Éric Toledano", actors: "François Cluzet, Omar Sy", theme: "Amistad & Superación", platform: "Netflix",
     description: "La conmovedora e hilarante amistad entre un aristócrata y su cuidador de los suburbios.", synopsis: "La conmovedora e hilarante amistad entre un aristócrata y su cuidador de los suburbios." 
   },
   { 
-    title: "La La Land", titulo: "La La Land", type: "movie", genre: "Musical / Romance", year: 2016, duration: "2h 08m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.png",
+    title: "La La Land", titulo: "La La Land", type: "movie", genre: "Musical / Romance", year: 2016, duration: "2h 08m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.svg",
     director: "Damien Chazelle", actors: "Ryan Gosling, Emma Stone", theme: "Sueños & Amor", platform: "Prime Video",
     description: "Un pianista de jazz y una aspirante a actriz persiguen sus sueños en Los Ángeles.", synopsis: "Un pianista de jazz y una aspirante a actriz persiguen sus sueños en Los Ángeles." 
   },
   { 
-    title: "Little Miss Sunshine", titulo: "Little Miss Sunshine", type: "movie", genre: "Comedia / Indie", year: 2006, duration: "1h 41m", mood: "Feliz", match: "97%", poster: "assets/happy_series_poster.png",
+    title: "Little Miss Sunshine", titulo: "Little Miss Sunshine", type: "movie", genre: "Comedia / Indie", year: 2006, duration: "1h 41m", mood: "Feliz", match: "97%", poster: "assets/happy_series_poster.svg",
     director: "Jonathan Dayton, Valerie Faris", actors: "Abigail Breslin, Steve Carell, Toni Collette", theme: "Unión Familiar", platform: "Disney+",
     description: "Una excéntrica familia viaja en furgoneta para apoyar el sueño de su hija pequeña.", synopsis: "Una excéntrica familia viaja en furgoneta para apoyar el sueño de su hija pequeña." 
   },
   { 
-    title: "Paddington 2", titulo: "Paddington 2", type: "movie", genre: "Familia / Aventura", year: 2017, duration: "1h 43m", mood: "Feliz", match: "99%", poster: "assets/happy_series_poster.png",
+    title: "Paddington 2", titulo: "Paddington 2", type: "movie", genre: "Familia / Aventura", year: 2017, duration: "1h 43m", mood: "Feliz", match: "99%", poster: "assets/happy_series_poster.svg",
     director: "Paul King", actors: "Ben Whishaw, Hugh Grant", theme: "Bondad & Optimismo", platform: "HBO Max",
     description: "El entrañable oso Paddington busca el regalo perfecto para su tía Lucy en Londres.", synopsis: "El entrañable oso Paddington busca el regalo perfecto para su tía Lucy en Londres." 
   },
   { 
-    title: "Amélie", titulo: "Amélie", type: "movie", genre: "Comedia Romántica", year: 2001, duration: "2h 02m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.png",
+    title: "Amélie", titulo: "Amélie", type: "movie", genre: "Comedia Romántica", year: 2001, duration: "2h 02m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.svg",
     director: "Jean-Pierre Jeunet", actors: "Audrey Tautou, Mathieu Kassovitz", theme: "Felicidad Cotidiana", platform: "Apple TV+",
     description: "Una camarera parisina decide mejorar en secreto la vida de las personas que la rodean.", synopsis: "Una camarera parisina decide mejorar en secreto la vida de las personas que la rodean." 
   },
   { 
-    title: "Sing Street", titulo: "Sing Street", type: "movie", genre: "Música / Comedia", year: 2016, duration: "1h 46m", mood: "Feliz", match: "96%", poster: "assets/happy_series_poster.png",
+    title: "Sing Street", titulo: "Sing Street", type: "movie", genre: "Música / Comedia", year: 2016, duration: "1h 46m", mood: "Feliz", match: "96%", poster: "assets/happy_series_poster.svg",
     director: "John Carney", actors: "Ferdia Walsh-Peelo, Lucy Boynton", theme: "Juventud & Música", platform: "Prime Video",
     description: "Un joven de Dublín en los 80 forma una banda de rock para impresionar a una chica.", synopsis: "Un joven de Dublín en los 80 forma una banda de rock para impresionar a una chica." 
   },
   { 
-    title: "Mamma Mia!", titulo: "Mamma Mia!", type: "movie", genre: "Musical / Comedia", year: 2008, duration: "1h 48m", mood: "Feliz", match: "95%", poster: "assets/happy_series_poster.png",
+    title: "Mamma Mia!", titulo: "Mamma Mia!", type: "movie", genre: "Musical / Comedia", year: 2008, duration: "1h 48m", mood: "Feliz", match: "95%", poster: "assets/happy_series_poster.svg",
     director: "Phyllida Lloyd", actors: "Meryl Streep, Amanda Seyfried, Pierce Brosnan", theme: "Celebración & Alegría", platform: "Netflix",
     description: "Una novia en una isla griega busca descubrir la identidad de su padre cantando ABBA.", synopsis: "Una novia en una isla griega busca descubrir la identidad de su padre cantando ABBA." 
   },
   { 
-    title: "Soul", titulo: "Soul", type: "movie", genre: "Animación / Familia", year: 2020, duration: "1h 40m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.png",
+    title: "Soul", titulo: "Soul", type: "movie", genre: "Animación / Familia", year: 2020, duration: "1h 40m", mood: "Feliz", match: "98%", poster: "assets/happy_series_poster.svg",
     director: "Pete Docter", actors: "Jamie Foxx, Tina Fey", theme: "Propósito de Vida", platform: "Disney+",
     description: "Un profesor de música viaja al Gran Antes para descubrir qué nos hace tener alma.", synopsis: "Un profesor de música viaja al Gran Antes para descubrir qué nos hace tener alma." 
   },
   { 
-    title: "Chef", titulo: "Chef", type: "movie", genre: "Comedia / Gastronomía", year: 2014, duration: "1h 54m", mood: "Feliz", match: "96%", poster: "assets/happy_series_poster.png",
+    title: "Chef", titulo: "Chef", type: "movie", genre: "Comedia / Gastronomía", year: 2014, duration: "1h 54m", mood: "Feliz", match: "96%", poster: "assets/happy_series_poster.svg",
     director: "Jon Favreau", actors: "Jon Favreau, Sofía Vergara, John Leguizamo", theme: "Pasión & Reinvención", platform: "Prime Video",
     description: "Un talentoso chef reinicia su pasión creando un food truck de comida latina con su hijo.", synopsis: "Un talentoso chef reinicia su pasión creando un food truck de comida latina con su hijo." 
   },
   { 
-    title: "La novicia rebelde (The Sound of Music)", titulo: "La novicia rebelde", type: "movie", genre: "Musical Clásico", year: 1965, duration: "2h 54m", mood: "Feliz", match: "97%", poster: "assets/happy_series_poster.png",
+    title: "La novicia rebelde (The Sound of Music)", titulo: "La novicia rebelde", type: "movie", genre: "Musical Clásico", year: 1965, duration: "2h 54m", mood: "Feliz", match: "97%", poster: "assets/happy_series_poster.svg",
     director: "Robert Wise", actors: "Julie Andrews, Christopher Plummer", theme: "Esperanza & Música", platform: "Disney+",
     description: "Una novicia lleva música y alegría a los siete hijos de un estricto capitán austríaco.", synopsis: "Una novicia lleva música y alegría a los siete hijos de un estricto capitán austríaco." 
   },
 
   // TRISTE (Películas)
   { 
-    title: "Manchester junto al mar", titulo: "Manchester junto al mar", type: "movie", genre: "Drama Profundo", year: 2016, duration: "2h 17m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "Manchester junto al mar", titulo: "Manchester junto al mar", type: "movie", genre: "Drama Profundo", year: 2016, duration: "2h 17m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Kenneth Lonergan", actors: "Casey Affleck, Michelle Williams", theme: "Duelo & Culpabilidad", platform: "Prime Video",
     description: "Un hombre atormentado por su pasado regresa a su pueblo para cuidar a su sobrino.", synopsis: "Un hombre atormentado por su pasado regresa a su pueblo para cuidar a su sobrino." 
   },
   { 
-    title: "Eterno resplandor de una mente sin recuerdos", titulo: "Eterno resplandor de una mente sin recuerdos", type: "movie", genre: "Drama / Romance", year: 2004, duration: "1h 48m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "Eterno resplandor de una mente sin recuerdos", titulo: "Eterno resplandor de una mente sin recuerdos", type: "movie", genre: "Drama / Romance", year: 2004, duration: "1h 48m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Michel Gondry", actors: "Jim Carrey, Kate Winslet", theme: "Memoria & Desamor", platform: "HBO Max",
     description: "Una pareja se somete a un procedimiento médico para borrar sus recuerdos mutuos.", synopsis: "Una pareja se somete a un procedimiento médico para borrar sus recuerdos mutuos." 
   },
   { 
-    title: "En busca de la felicidad", titulo: "En busca de la felicidad", type: "movie", genre: "Drama Inspirador", year: 2006, duration: "1h 57m", mood: "Triste", match: "97%", poster: "assets/movie_poster_echoes.png",
+    title: "En busca de la felicidad", titulo: "En busca de la felicidad", type: "movie", genre: "Drama Inspirador", year: 2006, duration: "1h 57m", mood: "Triste", match: "97%", poster: "assets/movie_poster_echoes.svg",
     director: "Gabriele Muccino", actors: "Will Smith, Jaden Smith", theme: "Sacrificio & Amor Paterno", platform: "Netflix",
     description: "Un padre lucha sin descanso junto a su hijo superando la bancarrota en San Francisco.", synopsis: "Un padre lucha sin descanso junto a su hijo superando la bancarrota en San Francisco." 
   },
   { 
-    title: "La lista de Schindler", titulo: "La lista de Schindler", type: "movie", genre: "Drama Histórico", year: 1993, duration: "3h 15m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "La lista de Schindler", titulo: "La lista de Schindler", type: "movie", genre: "Drama Histórico", year: 1993, duration: "3h 15m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Steven Spielberg", actors: "Liam Neeson, Ben Kingsley, Ralph Fiennes", theme: "Humanidad en la Tragedia", platform: "Prime Video",
     description: "Un empresario alemán salva la vida de más de mil refugiados judios durante el Holocausto.", synopsis: "Un empresario alemán salva la vida de más de mil refugiados judios durante el Holocausto." 
   },
   { 
-    title: "La tumba de las luciérnagas", titulo: "La tumba de las luciérnagas", type: "movie", genre: "Animación / Bélico", year: 1988, duration: "1h 29m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "La tumba de las luciérnagas", titulo: "La tumba de las luciérnagas", type: "movie", genre: "Animación / Bélico", year: 1988, duration: "1h 29m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Isao Takahata", actors: "Tsutomu Tatsumi, Ayano Shiraishi", theme: "Inocencia Perdida", platform: "Netflix",
     description: "Dos hermanos luchan por sobrevivir solos en el Japón de la Segunda Guerra Mundial.", synopsis: "Dos hermanos luchan por sobrevivir solos en el Japón de la Segunda Guerra Mundial." 
   },
   { 
-    title: "Nace una estrella (A Star Is Born)", titulo: "Nace una estrella", type: "movie", genre: "Drama / Musical", year: 2018, duration: "2h 16m", mood: "Triste", match: "96%", poster: "assets/movie_poster_echoes.png",
+    title: "Nace una estrella (A Star Is Born)", titulo: "Nace una estrella", type: "movie", genre: "Drama / Musical", year: 2018, duration: "2h 16m", mood: "Triste", match: "96%", poster: "assets/movie_poster_echoes.svg",
     director: "Bradley Cooper", actors: "Lady Gaga, Bradley Cooper", theme: "Fama & Adicciones", platform: "HBO Max",
     description: "Un veterano músico ayuda a lanzar la carrera de una joven artista mientras sus demonios lo consumen.", synopsis: "Un veterano músico ayuda a lanzar la carrera de una joven artista mientras sus demonios lo consumen." 
   },
   { 
-    title: "La milla verde", titulo: "La milla verde", type: "movie", genre: "Drama / Fantasía", year: 1999, duration: "3h 09m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "La milla verde", titulo: "La milla verde", type: "movie", genre: "Drama / Fantasía", year: 1999, duration: "3h 09m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Frank Darabont", actors: "Tom Hanks, Michael Clarke Duncan", theme: "Justicia & Milagros", platform: "Prime Video",
     description: "Un guardia del corredor de la muerte descubre que un recluso posee un milagroso don.", synopsis: "Un guardia del corredor de la muerte descubre que un recluso posee un milagroso don." 
   },
   { 
-    title: "Historia de un matrimonio", titulo: "Historia de un matrimonio", type: "movie", genre: "Drama Intimista", year: 2019, duration: "2h 16m", mood: "Triste", match: "97%", poster: "assets/movie_poster_echoes.png",
+    title: "Historia de un matrimonio", titulo: "Historia de un matrimonio", type: "movie", genre: "Drama Intimista", year: 2019, duration: "2h 16m", mood: "Triste", match: "97%", poster: "assets/movie_poster_echoes.svg",
     director: "Noah Baumbach", actors: "Scarlett Johansson, Adam Driver", theme: "Ruptura & Comprensión", platform: "Netflix",
     description: "Un director de teatro y su esposa actriz enfrentan un complejo proceso de divorcio.", synopsis: "Un director de teatro y su esposa actriz enfrentan un complejo proceso de divorcio." 
   },
   { 
-    title: "La vida es bella", titulo: "La vida es bella", type: "movie", genre: "Drama / Comedia", year: 1997, duration: "1h 56m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "La vida es bella", titulo: "La vida es bella", type: "movie", genre: "Drama / Comedia", year: 1997, duration: "1h 56m", mood: "Triste", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Roberto Benigni", actors: "Roberto Benigni, Nicoletta Braschi", theme: "Amor Incondicional", platform: "Apple TV+",
     description: "Un padre usa el humor y la imaginación para proteger a su hijo en un campo de concentración.", synopsis: "Un padre usa el humor y la imaginación para proteger a su hijo en un campo de concentración." 
   },
   { 
-    title: "La sociedad de los poetas muertos", titulo: "La sociedad de los poetas muertos", type: "movie", genre: "Drama Educativo", year: 1989, duration: "2h 08m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "La sociedad de los poetas muertos", titulo: "La sociedad de los poetas muertos", type: "movie", genre: "Drama Educativo", year: 1989, duration: "2h 08m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Peter Weir", actors: "Robin Williams, Robert Sean Leonard, Ethan Hawke", theme: "Carpe Diem & Libertad", platform: "Disney+",
     description: "Un profesor heterodoxo inspira a sus alumnos a amar la poesía y vivir el momento.", synopsis: "Un profesor heterodoxo inspira a sus alumnos a amar la poesía y vivir el momento." 
   },
   { 
-    title: "Echoes of Calm", titulo: "Echoes of Calm", type: "movie", genre: "Drama / Poético", year: 2023, duration: "2h 05m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "Echoes of Calm", titulo: "Echoes of Calm", type: "movie", genre: "Drama / Poético", year: 2023, duration: "2h 05m", mood: "Triste", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Julian Vance", actors: "Claire Redfield, Samuel Stone", theme: "Serenidad Interior", platform: "ANISAM Original",
     description: "Una conmovedora historia sobre la superación y el abrazo a la serenidad interior.", synopsis: "Una conmovedora historia sobre la superación y el abrazo a la serenidad interior." 
   },
 
   // ENERGIA (Películas)
   { 
-    title: "Mad Max: Furia en el camino", titulo: "Mad Max: Furia en el camino", type: "movie", genre: "Acción Postapocalíptica", year: 2015, duration: "2h 00m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Mad Max: Furia en el camino", titulo: "Mad Max: Furia en el camino", type: "movie", genre: "Acción Postapocalíptica", year: 2015, duration: "2h 00m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "George Miller", actors: "Tom Hardy, Charlize Theron", theme: "Adrenalina & Libertad", platform: "HBO Max",
     description: "En un desierto distópico, una mujer se rebela contra un tirano liderando una huida frenética.", synopsis: "En un desierto distópico, una mujer se rebela contra un tirano liderando una huida frenética." 
   },
   { 
-    title: "Top Gun: Maverick", titulo: "Top Gun: Maverick", type: "movie", genre: "Acción / Aviación", year: 2022, duration: "2h 10m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Top Gun: Maverick", titulo: "Top Gun: Maverick", type: "movie", genre: "Acción / Aviación", year: 2022, duration: "2h 10m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Joseph Kosinski", actors: "Tom Cruise, Miles Teller, Jennifer Connelly", theme: "Valentía & Velocidad", platform: "Paramount+ / Prime Video",
     description: "Maverick entrena a una promoción de pilotos de combate para una misión extrema sin retorno.", synopsis: "Maverick entrena a una promoción de pilotos de combate para una misión extrema sin retorno." 
   },
   { 
-    title: "Avengers: Endgame", titulo: "Avengers: Endgame", type: "movie", genre: "Acción / Superhéroes", year: 2019, duration: "3h 01m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "Avengers: Endgame", titulo: "Avengers: Endgame", type: "movie", genre: "Acción / Superhéroes", year: 2019, duration: "3h 01m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Anthony Russo, Joe Russo", actors: "Robert Downey Jr., Chris Evans, Scarlett Johansson", theme: "Épica & Sacrificio", platform: "Disney+",
     description: "Los Vengadores sobrevivientes se reúnen para revertir las acciones de Thanos.", synopsis: "Los Vengadores sobrevivientes se reúnen para revertir las acciones de Thanos." 
   },
   { 
-    title: "John Wick", titulo: "John Wick", type: "movie", genre: "Acción / Thriller", year: 2014, duration: "1h 41m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.png",
+    title: "John Wick", titulo: "John Wick", type: "movie", genre: "Acción / Thriller", year: 2014, duration: "1h 41m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.svg",
     director: "Chad Stahelski", actors: "Keanu Reeves, Michael Nyqvist", theme: "Venganza & Combate", platform: "Prime Video",
     description: "Un legendario asesino retirado vuelve a las armas para vengar una pérdida personal.", synopsis: "Un legendario asesino retirado vuelve a las armas para vengar una pérdida personal." 
   },
   { 
-    title: "Batman: El caballero de la noche", titulo: "Batman: El caballero de la noche", type: "movie", genre: "Acción / Crimen", year: 2008, duration: "2h 32m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Batman: El caballero de la noche", titulo: "Batman: El caballero de la noche", type: "movie", genre: "Acción / Crimen", year: 2008, duration: "2h 32m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Christopher Nolan", actors: "Christian Bale, Heath Ledger", theme: "Caos vs Justicia", platform: "HBO Max",
     description: "Batman enfrenta su mayor desafío psicológico y físico contra el Guasón en Ciudad Gótica.", synopsis: "Batman enfrenta su mayor desafío psicológico y físico contra el Guasón en Ciudad Gótica." 
   },
   { 
-    title: "Rápidos y Furiosos 5", titulo: "Rápidos y Furiosos 5", type: "movie", genre: "Acción / Autos", year: 2011, duration: "2h 10m", mood: "Energia", match: "95%", poster: "assets/energetic_synth_art.png",
+    title: "Rápidos y Furiosos 5", titulo: "Rápidos y Furiosos 5", type: "movie", genre: "Acción / Autos", year: 2011, duration: "2h 10m", mood: "Energia", match: "95%", poster: "assets/energetic_synth_art.svg",
     director: "Justin Lin", actors: "Vin Diesel, Paul Walker, Dwayne Johnson", theme: "Fuerza & Lealtad", platform: "Netflix",
     description: "Dominic Toretto y su equipo organizan un atraco de 100 millones en Río de Janeiro.", synopsis: "Dominic Toretto y su equipo organizan un atraco de 100 millones en Río de Janeiro." 
   },
   { 
-    title: "Misión Imposible: Repercusión", titulo: "Misión Imposible: Repercusión", type: "movie", genre: "Acción / Espionaje", year: 2018, duration: "2h 27m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "Misión Imposible: Repercusión", titulo: "Misión Imposible: Repercusión", type: "movie", genre: "Acción / Espionaje", year: 2018, duration: "2h 27m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Christopher McQuarrie", actors: "Tom Cruise, Henry Cavill, Rebecca Ferguson", theme: "Riesgo Extremo", platform: "Paramount+",
     description: "Ethan Hunt y su equipo corren contra el tiempo tras una misión fallida que pone en riesgo al mundo.", synopsis: "Ethan Hunt y su equipo corren contra el tiempo tras una misión fallida que pone en riesgo al mundo." 
   },
   { 
-    title: "Gladiador", titulo: "Gladiador", type: "movie", genre: "Acción / Épico", year: 2000, duration: "2h 35m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "Gladiador", titulo: "Gladiador", type: "movie", genre: "Acción / Épico", year: 2000, duration: "2h 35m", mood: "Energia", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Ridley Scott", actors: "Russell Crowe, Joaquin Phoenix", theme: "Honor & Venganza", platform: "Netflix",
     description: "Un general romano traicionado busca venganza contra el corrupto emperador en el Coliseo.", synopsis: "Un general romano traicionado busca venganza contra el corrupto emperador en el Coliseo." 
   },
   { 
-    title: "Whiplash", titulo: "Whiplash", type: "movie", genre: "Drama / Música", year: 2014, duration: "1h 46m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Whiplash", titulo: "Whiplash", type: "movie", genre: "Drama / Música", year: 2014, duration: "1h 46m", mood: "Energia", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Damien Chazelle", actors: "Miles Teller, J.K. Simmons", theme: "Obsesión & Excelencia", platform: "Netflix",
     description: "Un joven baterista de jazz es llevado al límite por su despiadado e insaciable instructor.", synopsis: "Un joven baterista de jazz es llevado al límite por su despiadado e insaciable instructor." 
   },
   { 
-    title: "Rocky", titulo: "Rocky", type: "movie", genre: "Deportes / Drama", year: 1976, duration: "1h 59m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.png",
+    title: "Rocky", titulo: "Rocky", type: "movie", genre: "Deportes / Drama", year: 1976, duration: "1h 59m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.svg",
     director: "John G. Avildsen", actors: "Sylvester Stallone, Talia Shire", theme: "Perseverancia", platform: "Prime Video",
     description: "Un boxeador de poca monta recibe la oportunidad de luchar contra el campeón mundial pesados.", synopsis: "Un boxeador de poca monta recibe la oportunidad de luchar contra el campeón mundial pesados." 
   },
   { 
-    title: "Neon Overdrive", titulo: "Neon Overdrive", type: "movie", genre: "Acción / Cyberpunk", year: 2024, duration: "2h 15m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.png",
+    title: "Neon Overdrive", titulo: "Neon Overdrive", type: "movie", genre: "Acción / Cyberpunk", year: 2024, duration: "2h 15m", mood: "Energia", match: "97%", poster: "assets/energetic_synth_art.svg",
     director: "Kenji Sato", actors: "Ryu Tanaka, Maya Lin", theme: "Futurismo & Carreras", platform: "ANISAM Original",
     description: "Un thriller cibernético cargado de adrenalina y carreras extremas neon.", synopsis: "Un thriller cibernético cargado de adrenalina y carreras extremas neon." 
   },
 
   // RELAX (Películas)
   { 
-    title: "Mi vecino Totoro", titulo: "Mi vecino Totoro", type: "movie", genre: "Animación / Fantasía", year: 1988, duration: "1h 26m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "Mi vecino Totoro", titulo: "Mi vecino Totoro", type: "movie", genre: "Animación / Fantasía", year: 1988, duration: "1h 26m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Hayao Miyazaki", actors: "Noriko Hidaka, Chika Sakamoto", theme: "Naturaleza & Magia Infantil", platform: "Netflix",
     description: "Dos niñas entablan amistad con un espíritu del bosque en el Japón rural.", synopsis: "Dos niñas entablan amistad con un espíritu del bosque en el Japón rural." 
   },
   { 
-    title: "El viaje de Chihiro", titulo: "El viaje de Chihiro", type: "movie", genre: "Animación / Aventura", year: 2001, duration: "2h 05m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "El viaje de Chihiro", titulo: "El viaje de Chihiro", type: "movie", genre: "Animación / Aventura", year: 2001, duration: "2h 05m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Hayao Miyazaki", actors: "Rumi Hiiragi, Miyu Irino", theme: "Madurez & Espiritualidad", platform: "Netflix",
     description: "Una niña de 10 años se adentra en un mundo mágico de espíritus y dioses.", synopsis: "Una niña de 10 años se adentra en un mundo mágico de espíritus y dioses." 
   },
   { 
-    title: "Un buen día en el vecindario", titulo: "Un buen día en el vecindario", type: "movie", genre: "Drama Sereno", year: 2019, duration: "1h 49m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.png",
+    title: "Un buen día en el vecindario", titulo: "Un buen día en el vecindario", type: "movie", genre: "Drama Sereno", year: 2019, duration: "1h 49m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.svg",
     director: "Marielle Heller", actors: "Tom Hanks, Matthew Rhys", theme: "Bondad & Perdón", platform: "Prime Video",
     description: "Un periodista cínico entabla una reconfortante amistad con el querido presentador Fred Rogers.", synopsis: "Un periodista cínico entabla una reconfortante amistad con el querido presentador Fred Rogers." 
   },
   { 
-    title: "Medianoche en París", titulo: "Medianoche en París", type: "movie", genre: "Comedia Romántica", year: 2011, duration: "1h 34m", mood: "Relax", match: "97%", poster: "assets/movie_poster_echoes.png",
+    title: "Medianoche en París", titulo: "Medianoche en París", type: "movie", genre: "Comedia Romántica", year: 2011, duration: "1h 34m", mood: "Relax", match: "97%", poster: "assets/movie_poster_echoes.svg",
     director: "Woody Allen", actors: "Owen Wilson, Rachel McAdams, Marion Cotillard", theme: "Arte & Nostalgia", platform: "HBO Max",
     description: "Un guionista viaja mágicamente al París de los años 20 todas las medianoches.", synopsis: "Un guionista viaja mágicamente al París de los años 20 todas las medianoches." 
   },
   { 
-    title: "El fantástico Sr. Zorro", titulo: "El fantástico Sr. Zorro", type: "movie", genre: "Stop-motion / Aventura", year: 2009, duration: "1h 27m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.png",
+    title: "El fantástico Sr. Zorro", titulo: "El fantástico Sr. Zorro", type: "movie", genre: "Stop-motion / Aventura", year: 2009, duration: "1h 27m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.svg",
     director: "Wes Anderson", actors: "George Clooney, Meryl Streep", theme: "Ingenio & Familia", platform: "Disney+",
     description: "Un astuto zorro organiza un ingenioso plan para burla a tres avariciosos granjeros.", synopsis: "Un astuto zorro organiza un ingenioso plan para burla a tres avariciosos granjeros." 
   },
   { 
-    title: "La increíble vida de Walter Mitty", titulo: "La increíble vida de Walter Mitty", type: "movie", genre: "Aventura / Drama", year: 2013, duration: "1h 54m", mood: "Relax", match: "97%", poster: "assets/movie_poster_echoes.png",
+    title: "La increíble vida de Walter Mitty", titulo: "La increíble vida de Walter Mitty", type: "movie", genre: "Aventura / Drama", year: 2013, duration: "1h 54m", mood: "Relax", match: "97%", poster: "assets/movie_poster_echoes.svg",
     director: "Ben Stiller", actors: "Ben Stiller, Kristen Wiig", theme: "Paz & Descubrimiento", platform: "Disney+",
     description: "Un soñador rutinario emprende un viaje real por paisajes asombrosos del mundo.", synopsis: "Un soñador rutinario emprende un viaje real por paisajes asombrosos del mundo." 
   },
   { 
-    title: "Baraka", titulo: "Baraka", type: "movie", genre: "Documental Visual", year: 1992, duration: "1h 36m", mood: "Relax", match: "98%", poster: "assets/movie_poster_echoes.png",
+    title: "Baraka", titulo: "Baraka", type: "movie", genre: "Documental Visual", year: 1992, duration: "1h 36m", mood: "Relax", match: "98%", poster: "assets/movie_poster_echoes.svg",
     director: "Ron Fricke", actors: "Sin diálogos", theme: "Armonía & Planeta", platform: "YouTube / Prime",
     description: "Un recorrido poético sin palabras por la naturaleza, la religión y la condición humana.", synopsis: "Un recorrido poético sin palabras por la naturaleza, la religión y la condición humana." 
   },
   { 
-    title: "Nuestro planeta", titulo: "Nuestro planeta", type: "movie", genre: "Documental Naturaleza", year: 2019, duration: "1h 30m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "Nuestro planeta", titulo: "Nuestro planeta", type: "movie", genre: "Documental Naturaleza", year: 2019, duration: "1h 30m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Alastair Fothergill", actors: "David Attenborough, Salma Hayek", theme: "Maravillas Terrestres", platform: "Netflix",
     description: "Asombrosas imágenes en alta definición de la vida salvaje en los ecosistemas de la Tierra.", synopsis: "Asombrosas imágenes en alta definición de la vida salvaje en los ecosistemas de la Tierra." 
   },
   { 
-    title: "El Silencio de los Valles", titulo: "El Silencio de los Valles", type: "movie", genre: "Documental / Naturaleza", year: 2022, duration: "1h 30m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.png",
+    title: "El Silencio de los Valles", titulo: "El Silencio de los Valles", type: "movie", genre: "Documental / Naturaleza", year: 2022, duration: "1h 30m", mood: "Relax", match: "99%", poster: "assets/movie_poster_echoes.svg",
     director: "Laura Sola", actors: "Sonidos de la Naturaleza", theme: "Paz & Bosques", platform: "ANISAM Original",
     description: "Imágenes pacíficas y sonidos envolventes de los bosques más vírgenes del planeta.", synopsis: "Imágenes pacíficas y sonidos envolventes de los bosques más vírgenes del planeta." 
   },
   { 
-    title: "El viaje del emperador", titulo: "El viaje del emperador", type: "movie", genre: "Documental", year: 2005, duration: "1h 25m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.png",
+    title: "El viaje del emperador", titulo: "El viaje del emperador", type: "movie", genre: "Documental", year: 2005, duration: "1h 25m", mood: "Relax", match: "96%", poster: "assets/movie_poster_echoes.svg",
     director: "Luc Jacquet", actors: "Morgan Freeman, Charles Berling", theme: "Persistencia Pacífica", platform: "Prime Video",
     description: "El épico viaje de los pingüinos emperador para reproducirse en la Antártida.", synopsis: "El épico viaje de los pingüinos emperador para reproducirse en la Antártida." 
   },
 
   // ENTRETENIDO (Películas)
   { 
-    title: "El origen (Inception)", titulo: "El origen", type: "movie", genre: "Sci-Fi / Thriller", year: 2010, duration: "2h 28m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "El origen (Inception)", titulo: "El origen", type: "movie", genre: "Sci-Fi / Thriller", year: 2010, duration: "2h 28m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Christopher Nolan", actors: "Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page", theme: "Sueños & Realidad", platform: "HBO Max",
     description: "Un ladrón que roba secretos corporativos a través del sueño debe implantar una idea.", synopsis: "Un ladrón que roba secretos corporativos a través del sueño debe implantar una idea." 
   },
   { 
-    title: "Entre navajas y secretos (Knives Out)", titulo: "Entre navajas y secretos", type: "movie", genre: "Misterio / Comedia", year: 2019, duration: "2h 10m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "Entre navajas y secretos (Knives Out)", titulo: "Entre navajas y secretos", type: "movie", genre: "Misterio / Comedia", year: 2019, duration: "2h 10m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Rian Johnson", actors: "Daniel Craig, Ana de Armas, Chris Evans", theme: "Intriga & Detective", platform: "Netflix",
     description: "Un perspicaz detective investiga la misteriosa muerte del patriarca de una excéntrica familia.", synopsis: "Un perspicaz detective investiga la misteriosa muerte del patriarca de una excéntrica familia." 
   },
   { 
-    title: "Volver al futuro", titulo: "Volver al futuro", type: "movie", genre: "Sci-Fi / Aventura", year: 1985, duration: "1h 56m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Volver al futuro", titulo: "Volver al futuro", type: "movie", genre: "Sci-Fi / Aventura", year: 1985, duration: "1h 56m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Robert Zemeckis", actors: "Michael J. Fox, Christopher Lloyd", theme: "Viajes en el Tiempo", platform: "Prime Video",
     description: "Marty McFly viaja accidentalmente a 1955 en un DeLorean inventado por el profesor Doc Brown.", synopsis: "Marty McFly viaja accidentalmente a 1955 en un DeLorean inventado por el profesor Doc Brown." 
   },
   { 
-    title: "El gran hotel Budapest", titulo: "El gran hotel Budapest", type: "movie", genre: "Comedia / Estética", year: 2014, duration: "1h 39m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "El gran hotel Budapest", titulo: "El gran hotel Budapest", type: "movie", genre: "Comedia / Estética", year: 2014, duration: "1h 39m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Wes Anderson", actors: "Ralph Fiennes, Tony Revolori", theme: "Aventura & Arte", platform: "Star+ / Disney+",
     description: "Las aventuras de un legendario conserje de un famoso hotel europeo y su leal botones.", synopsis: "Las aventuras de un legendario conserje de un famoso hotel europeo y su leal botones." 
   },
   { 
-    title: "Todo en todas partes al mismo tiempo", titulo: "Todo en todas partes al mismo tiempo", type: "movie", genre: "Multiverso / Acción", year: 2022, duration: "2h 19m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Todo en todas partes al mismo tiempo", titulo: "Todo en todas partes al mismo tiempo", type: "movie", genre: "Multiverso / Acción", year: 2022, duration: "2h 19m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Daniel Kwan, Daniel Scheinert", actors: "Michelle Yeoh, Ke Huy Quan, Jamie Lee Curtis", theme: "Multiverso & Familia", platform: "Prime Video",
     description: "Una inmigrante china en EE. UU. se conecta con sus versiones de otros universos para salvar la existencia.", synopsis: "Una inmigrante china en EE. UU. se conecta con sus versiones de otros universos para salvar la existencia." 
   },
   { 
-    title: "Atrápame si puedes", titulo: "Atrápame si puedes", type: "movie", genre: "Biografía / Comedia", year: 2002, duration: "2h 21m", mood: "Entretenido", match: "97%", poster: "assets/energetic_synth_art.png",
+    title: "Atrápame si puedes", titulo: "Atrápame si puedes", type: "movie", genre: "Biografía / Comedia", year: 2002, duration: "2h 21m", mood: "Entretenido", match: "97%", poster: "assets/energetic_synth_art.svg",
     director: "Steven Spielberg", actors: "Leonardo DiCaprio, Tom Hanks", theme: "Engaño & Persecución", platform: "Netflix",
     description: "Un audaz joven estafador es perseguido incansablemente por un agente dedicado del FBI.", synopsis: "Un audaz joven estafador es perseguido incansablemente por un agente dedicado del FBI." 
   },
   { 
-    title: "Parque Jurásico", titulo: "Parque Jurásico", type: "movie", genre: "Sci-Fi / Aventura", year: 1993, duration: "2h 07m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "Parque Jurásico", titulo: "Parque Jurásico", type: "movie", genre: "Sci-Fi / Aventura", year: 1993, duration: "2h 07m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Steven Spielberg", actors: "Sam Neill, Laura Dern, Jeff Goldblum", theme: "Dinosaurios & Ciencia", platform: "Prime Video",
     description: "Un parque temático con dinosaurios clonados se convierte en una trampa tras una falla de seguridad.", synopsis: "Un parque temático con dinosaurios clonados se convierte en una trampa tras una falla de seguridad." 
   },
   { 
-    title: "Spider-Man: Un nuevo universo", titulo: "Spider-Man: Un nuevo universo", type: "movie", genre: "Animación / Acción", year: 2018, duration: "1h 57m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.png",
+    title: "Spider-Man: Un nuevo universo", titulo: "Spider-Man: Un nuevo universo", type: "movie", genre: "Animación / Acción", year: 2018, duration: "1h 57m", mood: "Entretenido", match: "99%", poster: "assets/energetic_synth_art.svg",
     director: "Bob Persichetti, Peter Ramsey", actors: "Shameik Moore, Jake Johnson", theme: "Héroes & Estilo", platform: "Disney+",
     description: "Miles Morales se convierte en el nuevo Spider-Man y une fuerzas con héroes de otras dimensiones.", synopsis: "Miles Morales se convierte en el nuevo Spider-Man y une fuerzas con héroes de otras dimensiones." 
   },
   { 
-    title: "La gran estafa (Ocean's Eleven)", titulo: "La gran estafa", type: "movie", genre: "Atraco / Comedia", year: 2001, duration: "1h 56m", mood: "Entretenido", match: "97%", poster: "assets/energetic_synth_art.png",
+    title: "La gran estafa (Ocean's Eleven)", titulo: "La gran estafa", type: "movie", genre: "Atraco / Comedia", year: 2001, duration: "1h 56m", mood: "Entretenido", match: "97%", poster: "assets/energetic_synth_art.svg",
     director: "Steven Soderbergh", actors: "George Clooney, Brad Pitt, Matt Damon", theme: "Atraco Perfecto", platform: "HBO Max",
     description: "Danny Ocean reúne a once especialistas para robar simultáneamente tres grandes casinos de Las Vegas.", synopsis: "Danny Ocean reúne a once especialistas para robar simultáneamente tres grandes casinos de Las Vegas." 
   },
   { 
-    title: "El Enigma del Tiempo", titulo: "El Enigma del Tiempo", type: "movie", genre: "Misterio / Sci-Fi", year: 2023, duration: "2h 10m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.png",
+    title: "El Enigma del Tiempo", titulo: "El Enigma del Tiempo", type: "movie", genre: "Misterio / Sci-Fi", year: 2023, duration: "2h 10m", mood: "Entretenido", match: "98%", poster: "assets/energetic_synth_art.svg",
     director: "Victor Vance", actors: "Arthur Pendelton, Maya Lin", theme: "Acertijos & Tiempo", platform: "ANISAM Original",
     description: "Un detective descubre una anomalía temporal en medio de una red de conspiraciones.", synopsis: "Un detective descubre una anomalía temporal en medio de una red de conspiraciones." 
   }

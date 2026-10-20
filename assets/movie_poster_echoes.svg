@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Contenido emotivo">
+  <defs>
+    <linearGradient id="trBg" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#122a4d"/>
+      <stop offset="55%" stop-color="#15294f"/>
+      <stop offset="100%" stop-color="#0a1526"/>
+    </linearGradient>
+    <linearGradient id="trA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+    <radialGradient id="trGlow" cx="50%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#trBg)"/>
+  <circle cx="200" cy="152" r="160" fill="url(#trGlow)"/>
+
+  <g opacity="0.55" fill="#ffffff">
+    <circle cx="56" cy="58" r="1.6"/>
+    <circle cx="304" cy="44" r="1.4"/>
+    <circle cx="360" cy="112" r="1.7"/>
+    <circle cx="68" cy="326" r="1.3"/>
+    <circle cx="334" cy="338" r="1.5"/>
+  </g>
+
+  <g transform="translate(200 168)">
+    <circle r="72" fill="#0a1526" opacity="0.72"/>
+    <circle r="72" fill="none" stroke="url(#trA)" stroke-width="4"/>
+    <path d="M 0 -40 C 20 -8 20 6 0 16 C -20 6 -20 -8 0 -40 Z"
+          fill="url(#trA)" opacity="0.95"/>
+    <circle cx="-16" cy="-8" r="4" fill="#0a1526"/>
+    <path d="M -26 20 q 26 14 52 0" stroke="#bfdbfe" stroke-width="4"
+          fill="none" stroke-linecap="round" opacity="0.85"/>
+  </g>
+
+  <text x="200" y="330" text-anchor="middle"
+        font-family="Outfit, Inter, Segoe UI, sans-serif" font-size="24"
+        font-weight="700" letter-spacing="3" fill="#eaf3ff">REFLEXIÓN</text>
+  <text x="200" y="356" text-anchor="middle"
+        font-family="Inter, Segoe UI, sans-serif" font-size="12"
+        letter-spacing="1.5" fill="#9dc2f2">DRAMA Y SENSIBILIDAD</text>
+</svg>
