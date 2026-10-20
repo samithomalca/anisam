@@ -314,14 +314,26 @@
   // ------------------------------------------------------------------
   // API usada por app.js
   // ------------------------------------------------------------------
-  function onEntryAdded(entry) {
+  /**
+   * Guarda una entrada nueva.
+   * - Siempre la escribe en la caché local (para historial/estadísticas inmediatos).
+   * - Si hay sesión, la guarda en la base de datos de Appwrite.
+   * Devuelve { saved, remote, error } para que la UI pueda confirmar el resultado.
+   */
+  async function onEntryAdded(entry) {
     const key = cacheKey(user ? user.$id : null);
     writeCache(key, mergeEntries([entry].concat(readCache(key))));
 
-    if (user) {
-      createRemoteRow(entry).catch(function (err) {
-        console.warn('[ANISAM] Registro guardado localmente; se sincronizará luego.', err);
-      });
+    if (!user) {
+      return { saved: true, remote: false, error: null };
+    }
+
+    try {
+      await createRemoteRow(entry);
+      return { saved: true, remote: true, error: null };
+    } catch (err) {
+      console.warn('[ANISAM] Registro guardado localmente; se sincronizará luego.', err);
+      return { saved: true, remote: false, error: err };
     }
   }
 

@@ -320,7 +320,6 @@ function initMoodForm() {
   const intensityVal = document.getElementById('intensity-val');
   const nlpTextarea = document.getElementById('nlp-textarea');
   const detectedTagsContainer = document.getElementById('detected-tags');
-  const btnGetRecs = document.getElementById('btn-get-recommendations');
 
   // Helper to visually update active mood card and body attribute
   function updateMoodCardVisual(moodKey) {
@@ -392,9 +391,26 @@ function initMoodForm() {
     });
   }
 
-  // Submit Action -> Move to Recommendations Screen & Log History
-  if (btnGetRecs) {
-    btnGetRecs.addEventListener('click', () => {
+  // Acción principal -> Guardar la entrada y actualizar historial/estadísticas
+  const btnSaveMood = document.getElementById('btn-save-mood');
+  const saveFeedback = document.getElementById('save-feedback');
+
+  function showSaveFeedback(message, type) {
+    if (!saveFeedback) return;
+    saveFeedback.textContent = message || '';
+    saveFeedback.className = 'save-feedback' + (type ? ' save-feedback-' + type : '');
+  }
+
+  function setSaving(isSaving) {
+    if (!btnSaveMood) return;
+    btnSaveMood.disabled = isSaving;
+    btnSaveMood.innerHTML = isSaving
+      ? '<i class="ph ph-circle-notch"></i> Guardando…'
+      : '<i class="ph ph-check-circle"></i> Guardar Estado de Ánimo';
+  }
+
+  if (btnSaveMood) {
+    btnSaveMood.addEventListener('click', async () => {
       const currentMoodObj = MOOD_DATA[state.selectedMood] || MOOD_DATA.relax;
       const newEntry = {
         id: Date.now(),
@@ -406,22 +422,49 @@ function initMoodForm() {
         note: state.nlpText || 'Registro sin notas adicionales'
       };
 
+      // 1) Actualiza el estado local de inmediato (historial y estadísticas)
       state.history.unshift(newEntry);
-
-      // Persistencia: Appwrite si está disponible; si no, localStorage
-      if (window.AnisamBackend) {
-        window.AnisamBackend.onEntryAdded(newEntry);
-      } else {
-        localStorage.setItem('anisam_history', JSON.stringify(state.history));
-      }
-
-      // Setup Today's Habits
       state.habits = currentMoodObj.habits.map(h => ({ ...h }));
 
-      // Render Recommendations & Switch View
+      setSaving(true);
+      showSaveFeedback('', '');
+
+      // 2) Persiste: Appwrite si hay sesión; si no, localStorage
+      let result = { saved: true, remote: false, error: null };
+      try {
+        if (window.AnisamBackend) {
+          result = await window.AnisamBackend.onEntryAdded(newEntry);
+        } else {
+          localStorage.setItem('anisam_history', JSON.stringify(state.history));
+        }
+      } catch (err) {
+        console.error('[ANISAM] Error al guardar el registro:', err);
+        result = { saved: false, remote: false, error: err };
+      }
+
+      // 3) Refresca historial, estadísticas y calendario
       renderWeeklyCalendar();
-      renderRecommendations();
-      switchScreen('screen-recommendations');
+      renderHistory();
+      renderInsights();
+      renderHabits();
+
+      setSaving(false);
+
+      if (!result.saved) {
+        showSaveFeedback('No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.', 'error');
+        return;
+      }
+
+      if (window.AnisamBackend && window.AnisamBackend.getUser && window.AnisamBackend.getUser() && !result.remote) {
+        showSaveFeedback('Guardado en este dispositivo. Se sincronizará con tu cuenta cuando haya conexión.', 'warn');
+      } else {
+        showSaveFeedback('¡Estado de ánimo guardado! ' + currentMoodObj.emoji + ' ' + currentMoodObj.label, 'ok');
+      }
+
+      // 4) Limpia el campo de nota para el siguiente registro
+      state.nlpText = '';
+      if (nlpTextarea) nlpTextarea.value = '';
+      if (detectedTagsContainer) detectedTagsContainer.innerHTML = '';
     });
   }
 }
