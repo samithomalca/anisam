@@ -925,6 +925,14 @@ body {
   gap: 0.5rem;
 }
 
+/* Subtítulo aclaratorio bajo el título de cada sección de recomendaciones */
+.recs-section-subtitle {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: -0.55rem 0 0.95rem 0;
+}
+
 /* Two-column side-by-side layout for "Todo" filter */
 .recs-two-col-layout {
   display: grid;

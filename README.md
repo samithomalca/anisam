@@ -20,7 +20,7 @@ externa, así que nunca aparecen rotas ni con enlaces caídos.
 | Archivo | Uso |
 | --- | --- |
 | `assets/fallback-cover.svg` | Portada de respaldo (marca ANISAM) para cualquier imagen que falle |
-| `assets/chill_lofi_art.svg` | Música relajante y lofi |
+| `assets/musica_relajante.svg` | Música relajante (relajación y concentración) |
 | `assets/happy_series_poster.svg` | Contenido alegre (estado *Feliz*) |
 | `assets/energetic_synth_art.svg` | Contenido energético (estado *Con Energía*) |
 | `assets/movie_poster_echoes.svg` | Contenido emotivo / drama (estado *Triste*) |

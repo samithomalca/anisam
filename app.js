@@ -46,7 +46,7 @@ const MOOD_COVERS = {
   Feliz: 'assets/happy_series_poster.svg',
   Triste: 'assets/movie_poster_echoes.svg',
   Energia: 'assets/energetic_synth_art.svg',
-  Relax: 'assets/chill_lofi_art.svg',
+  Relax: 'assets/musica_relajante.svg',
   Entretenido: 'assets/happy_series_art.svg'
 };
 
@@ -191,7 +191,7 @@ function renderWeeklyCalendar() {
   const songs = getSongsForMood(state.selectedMood);
   const movies = getMoviesForMood(state.selectedMood);
 
-  const topSong = songs.length ? songs[0] : { title: 'Zen Meditation & Lofi', artist: 'Mindful Soundscapes', match: '99%', mood: 'Relax' };
+  const topSong = songs.length ? songs[0] : { title: 'Meditación Zen & Música Relajante', artist: 'Mindful Soundscapes', match: '99%', mood: 'Relax' };
   const topMovie = movies.length ? movies[0] : { title: 'Echoes of Calm', genre: 'Cine Indie', duration: '1h 45m', mood: 'Relax' };
 
   // Sync today's entry (Dom) with current selected mood state
@@ -493,18 +493,18 @@ function renderRecommendations() {
       const titleText = s.title || 'Canción';
       const yearText = s.year ? ` (${s.year})` : '';
       const matchPct = s.match || `${Math.max(90, 99 - (idx % 5))}%`;
-      const genreText = s.genre || 'Música';
+      const genreText = s.genre || 'Música Relajante';
       const artistText = s.artist || 'Artista no especificado';
       const albumText = s.album || 'Álbum / Sencillo';
-      const vibeText = s.vibe || s.mood || 'Vibra Emocional';
-      const descText = s.description || 'Una pista seleccionada especialmente para tu estado de ánimo actual.';
+      const vibeText = s.vibe || s.mood || 'Relajación y Concentración';
+      const descText = s.description || 'Una pista ideal para relajarte, bajar el ritmo y concentrarte sin distracciones.';
       const coverUrl = resolveCover(s, s.mood || state.selectedMood);
 
       return `
         <div class="media-card">
           <div class="media-card-cover">
             <img ${coverImgAttrs(coverUrl, titleText)} />
-            <span class="media-card-cover-badge">🎵 Música</span>
+            <span class="media-card-cover-badge">🎵 Relajación</span>
           </div>
           <div class="media-card-body">
             <div class="media-card-top-header">
