@@ -4,6 +4,7 @@
  */
 
 // Global Application State
+const initialFavorites = loadFavorites();
 const state = {
   activeScreen: 'screen-welcome',
   selectedMood: 'feliz',
@@ -12,12 +13,42 @@ const state = {
   activeFilter: 'all',
   habits: [],
   history: JSON.parse(localStorage.getItem('anisam_history') || '[]'),
+  favorites: initialFavorites.items,
+  favoriteStorageError: initialFavorites.error,
   playingTrack: null,
   audioCtx: null,
   oscillator: null,
   gainNode: null,
   isPlayingAudio: false
 };
+
+function loadFavorites() {
+  try {
+    const storedFavorites = localStorage.getItem('anisam_favorites');
+    if (!storedFavorites) return { items: [], error: null };
+
+    const favorites = JSON.parse(storedFavorites);
+    if (!Array.isArray(favorites)) {
+      throw new Error('El formato de favoritos guardado no es válido.');
+    }
+
+    return {
+      items: favorites.filter(favorite =>
+        favorite &&
+        (favorite.type === 'song' || favorite.type === 'movie') &&
+        favorite.item &&
+        typeof favorite.item === 'object'
+      ),
+      error: null
+    };
+  } catch (err) {
+    console.error('[ANISAM] No se pudieron cargar los favoritos:', err);
+    return {
+      items: [],
+      error: 'No se pudieron cargar los favoritos guardados en este navegador.'
+    };
+  }
+}
 
 // Mood Midpoints mapping for Card -> Slider (0-100 Range)
 const MOOD_MIDPOINTS = {
@@ -362,6 +393,7 @@ function switchScreen(screenId) {
     renderHistory();
     renderHabits();
   }
+  if (screenId === 'screen-favorites') renderFavorites();
 }
 
 // Expone el controlador de pantallas para el Auth Guard (appwrite.js)
@@ -383,6 +415,9 @@ function initNavigation() {
   if (logoBtn) {
     logoBtn.addEventListener('click', () => switchScreen('screen-welcome'));
   }
+
+  renderRecommendations();
+  renderFavorites();
 
   // Quick Filter Tabs in Recommendations Screen
   const filterBtns = document.querySelectorAll('.filter-tab-btn');
@@ -625,6 +660,7 @@ function renderRecommendations() {
       const vibeText = s.vibe || s.mood || 'Relajación y Concentración';
       const descText = s.description || 'Una pista ideal para relajarte, bajar el ritmo y concentrarte sin distracciones.';
       const coverUrl = resolveCover(s, s.mood || state.selectedMood);
+      const isSaved = isFavoriteSaved('song', s);
 
       return `
         <div class="media-card">
@@ -651,8 +687,8 @@ function renderRecommendations() {
             <p class="media-synopsis">${escapeHtml(descText)}</p>
 
             <div class="media-card-footer" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
-              <button class="ag-btn ag-btn-primary ag-btn-sm btn-save-favorite" style="width: 100%;">
-                💾 Guardar
+              <button class="ag-btn ${isSaved ? 'ag-btn-secondary' : 'ag-btn-primary'} ag-btn-sm btn-save-favorite" data-favorite-type="song" data-favorite-index="${idx}" aria-pressed="${isSaved}" style="width: 100%;">
+                ${isSaved ? '✓ Guardado' : '💾 Guardar'}
               </button>
             </div>
           </div>
@@ -664,7 +700,7 @@ function renderRecommendations() {
   // Render Movie Cards
   if (mediaGrid && showMovies) {
     const filteredMedia = getMoviesForMood(state.selectedMood).filter(m => m.type === 'movie');
-    mediaGrid.innerHTML = filteredMedia.map(m => {
+    mediaGrid.innerHTML = filteredMedia.map((m, idx) => {
       const titleText = m.title || m.titulo || 'Película';
       const descText = m.description || m.synopsis || 'Sin descripción disponible';
       const platformText = m.platform || 'Streaming';
@@ -672,6 +708,7 @@ function renderRecommendations() {
       const actorsText = m.actors || 'Elenco estelar';
       const themeText = m.theme || m.genre || 'Entretenimiento';
       const coverUrl = resolveCover(m, m.mood || state.selectedMood);
+      const isSaved = isFavoriteSaved('movie', m);
 
       return `
         <div class="media-card">
@@ -702,8 +739,8 @@ function renderRecommendations() {
             <p class="media-synopsis">${escapeHtml(descText)}</p>
 
             <div class="media-card-footer" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
-              <button class="ag-btn ag-btn-primary ag-btn-sm btn-save-favorite" style="width: 100%;">
-                💾 Guardar
+              <button class="ag-btn ${isSaved ? 'ag-btn-secondary' : 'ag-btn-primary'} ag-btn-sm btn-save-favorite" data-favorite-type="movie" data-favorite-index="${idx}" aria-pressed="${isSaved}" style="width: 100%;">
+                ${isSaved ? '✓ Guardado' : '💾 Guardar'}
               </button>
             </div>
           </div>
@@ -713,21 +750,128 @@ function renderRecommendations() {
   }
 }
 
+function getFavoriteId(type, item) {
+  const title = item.title || item.titulo || '';
+  const detail = type === 'song' ? item.artist || '' : item.year || '';
+  return `${type}:${title}:${detail}`;
+}
+
+function isFavoriteSaved(type, item) {
+  const id = getFavoriteId(type, item);
+  return state.favorites.some(favorite => getFavoriteId(favorite.type, favorite.item) === id);
+}
+
+function saveFavorites() {
+  try {
+    localStorage.setItem('anisam_favorites', JSON.stringify(state.favorites));
+    state.favoriteStorageError = null;
+    return true;
+  } catch (err) {
+    console.error('[ANISAM] No se pudieron guardar los favoritos:', err);
+    state.favoriteStorageError = 'No se pudieron guardar los cambios. Revisa el espacio disponible en tu navegador.';
+    return false;
+  }
+}
+
+function renderFavorites() {
+  const grid = document.getElementById('favorites-grid');
+  const feedback = document.getElementById('favorites-feedback');
+  if (!grid || !feedback) return;
+
+  feedback.textContent = state.favoriteStorageError || '';
+  feedback.classList.toggle('has-error', Boolean(state.favoriteStorageError));
+
+  if (state.favorites.length === 0) {
+    grid.innerHTML = '<p class="favorites-empty">Aún no has guardado ningún favorito.</p>';
+    return;
+  }
+
+  grid.innerHTML = state.favorites.map((favorite, index) => {
+    const item = favorite.item;
+    const isSong = favorite.type === 'song';
+    const title = item.title || item.titulo || (isSong ? 'Canción' : 'Película');
+    const coverUrl = resolveCover(item, item.mood || 'Relax');
+    const description = item.description || item.synopsis || 'Sin descripción disponible.';
+    const details = isSong
+      ? `<p class="media-detail-line"><strong>👤 Artista:</strong> ${escapeHtml(item.artist || 'No especificado')}</p>
+         <p class="media-detail-line"><strong>💿 Álbum:</strong> ${escapeHtml(item.album || 'No especificado')}</p>`
+      : `<p class="media-detail-line"><strong>🎬 Director:</strong> ${escapeHtml(item.director || 'No especificado')}</p>
+         <p class="media-detail-line"><strong>📅 Año:</strong> ${escapeHtml(item.year || 'No especificado')}</p>`;
+
+    return `
+      <article class="media-card">
+        <div class="media-card-cover">
+          <img ${coverImgAttrs(coverUrl, title)} />
+          <span class="media-card-cover-badge">${isSong ? '🎵 Canción' : '🎬 Película'}</span>
+        </div>
+        <div class="media-card-body">
+          <h4 class="media-card-title">${escapeHtml(title)}${item.year ? ` (${escapeHtml(item.year)})` : ''}</h4>
+          <div class="media-details-block">${details}</div>
+          <p class="media-synopsis">${escapeHtml(description)}</p>
+          <div class="media-card-footer">
+            <button class="ag-btn ag-btn-secondary ag-btn-sm btn-remove-favorite" data-favorite-index="${index}" style="width: 100%;">
+              Quitar de Guardados
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
 
 // Delegation Event Listeners for Music and Movie Card Actions
 function initMediaGridEvents() {
   const musicGrid = document.getElementById('music-grid-container');
   const mediaGrid = document.getElementById('media-grid-container');
+  const favoritesGrid = document.getElementById('favorites-grid');
 
   const handleGridClick = (e) => {
     const saveBtn = e.target.closest('.btn-save-favorite');
     if (saveBtn) {
-      alert('¡Guardado en tus favoritos de ANISAM!');
+      const type = saveBtn.dataset.favoriteType;
+      const index = Number(saveBtn.dataset.favoriteIndex);
+      const items = type === 'song'
+        ? getSongsForMood(state.selectedMood)
+        : getMoviesForMood(state.selectedMood).filter(item => item.type === 'movie');
+      const item = items[index];
+      if (!item || (type !== 'song' && type !== 'movie')) return;
+
+      const id = getFavoriteId(type, item);
+      const existingIndex = state.favorites.findIndex(favorite =>
+        getFavoriteId(favorite.type, favorite.item) === id
+      );
+      if (existingIndex >= 0) return;
+
+      const previousFavorites = state.favorites;
+      state.favorites = [...state.favorites, {
+        type,
+        item: {
+          ...item,
+          poster: resolveCover(item, item.mood || state.selectedMood)
+        }
+      }];
+      if (!saveFavorites()) state.favorites = previousFavorites;
+      renderRecommendations();
+      renderFavorites();
+      return;
+    }
+
+    const removeBtn = e.target.closest('.btn-remove-favorite');
+    if (removeBtn) {
+      const index = Number(removeBtn.dataset.favoriteIndex);
+      if (!Number.isInteger(index) || index < 0 || index >= state.favorites.length) return;
+
+      const previousFavorites = state.favorites;
+      state.favorites = state.favorites.filter((_, favoriteIndex) => favoriteIndex !== index);
+      if (!saveFavorites()) state.favorites = previousFavorites;
+      renderRecommendations();
+      renderFavorites();
     }
   };
 
   if (musicGrid) musicGrid.addEventListener('click', handleGridClick);
   if (mediaGrid) mediaGrid.addEventListener('click', handleGridClick);
+  if (favoritesGrid) favoritesGrid.addEventListener('click', handleGridClick);
 }
 
 // Utility Escapers

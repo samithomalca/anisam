@@ -45,6 +45,7 @@
   let authState = 'loading';   // 'loading' | 'locked' | 'unlocked'
   let gateEl = null;           // contenedor #auth-gate
   let gateMode = 'login';      // pestaña activa dentro de la pantalla de acceso
+  let logoutInProgress = false;
 
   if (isConfigured) {
     client = new SDK.Client().setEndpoint(CFG.endpoint).setProject(CFG.projectId);
@@ -356,19 +357,21 @@
   }
 
   async function logout() {
+    if (!account || !user || logoutInProgress) return;
+    logoutInProgress = true;
     try {
       await account.deleteSession({ sessionId: 'current' });
-    } catch (err) {
-      console.warn('[ANISAM] No se pudo cerrar la sesión.', err);
+      user = null;
+      stopRealtimeSubscription();
+      pendingRemoteEntries.clear();
+      updateAuthUI();
+      // Limpia la caché del usuario y vuelve a bloquear la app
+      emitChange(readCache(GUEST_CACHE_KEY));
+      resetGateForm();
+      setAuthState('locked');
+    } finally {
+      logoutInProgress = false;
     }
-    user = null;
-    stopRealtimeSubscription();
-    pendingRemoteEntries.clear();
-    updateAuthUI();
-    // Limpia la caché del usuario y vuelve a bloquear la app
-    emitChange(readCache(GUEST_CACHE_KEY));
-    resetGateForm();
-    setAuthState('locked');
   }
 
   async function checkSession() {
@@ -471,6 +474,7 @@
   function cacheElements() {
     els.openBtn = document.getElementById('auth-open-btn');
     els.logoutBtn = document.getElementById('auth-logout-btn');
+    els.feedback = document.getElementById('auth-feedback');
     els.chip = document.getElementById('auth-user-chip');
     els.chipLabel = document.getElementById('auth-user-email');
     els.modal = document.getElementById('auth-modal');
@@ -556,6 +560,12 @@
     if (els.chipLabel) els.chipLabel.textContent = loggedIn ? (user.email || user.name || 'Mi cuenta') : '';
     if (els.openBtn) els.openBtn.hidden = loggedIn;
     if (els.logoutBtn) els.logoutBtn.hidden = !loggedIn;
+  }
+
+  function showAuthFeedback(message) {
+    if (!els.feedback) return;
+    els.feedback.textContent = message;
+    els.feedback.hidden = !message;
   }
 
   function resetGateForm() {
@@ -692,8 +702,18 @@
       });
     }
     if (els.logoutBtn) {
-      els.logoutBtn.addEventListener('click', function () {
-        logout();
+      els.logoutBtn.addEventListener('click', async function () {
+        if (logoutInProgress) return;
+        els.logoutBtn.disabled = true;
+        showAuthFeedback('');
+        try {
+          await logout();
+        } catch (err) {
+          console.error('[ANISAM] No se pudo cerrar la sesión.', err);
+          showAuthFeedback('No se pudo cerrar la sesión. Revisa tu conexión e inténtalo de nuevo.');
+        } finally {
+          els.logoutBtn.disabled = false;
+        }
       });
     }
 
