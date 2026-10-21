@@ -469,6 +469,17 @@ body {
   font-size: 0.7rem;
 }
 
+/* Día sin registro: indicador neutral y discreto */
+.calendar-day-pill.empty-day .day-emoji-badge {
+  color: var(--text-dim);
+  opacity: 0.55;
+  font-weight: 700;
+}
+
+.calendar-day-pill.empty-day .day-name {
+  opacity: 0.6;
+}
+
 /* Floating Tooltip Box for Day Pill */
 .calendar-tooltip {
   position: absolute;

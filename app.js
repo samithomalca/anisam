@@ -154,16 +154,87 @@ const KEYWORD_MAP = {
   aburrido: 'entretenido'
 };
 
-// Sample Weekly History Logs (Lun - Dom)
-const DEFAULT_WEEKLY_LOGS = [
-  { day: 'Lun', moodKey: 'relax', moodLabel: 'Relax', emoji: '🧘', intensity: 8, song: 'Weightless', movie: 'Mi vecino Totoro', note: 'Meditación y tranquilidad' },
-  { day: 'Mar', moodKey: 'feliz', moodLabel: 'Feliz', emoji: '😊', intensity: 9, song: 'Walking on Sunshine', movie: 'Amigos (Intouchables)', note: 'Gran reunión con amigos' },
-  { day: 'Mié', moodKey: 'entretenido', moodLabel: 'Entretenido', emoji: '🎬', intensity: 7, song: 'Blinding Lights', movie: 'La La Land', note: 'Tarde de música y cine' },
-  { day: 'Jue', moodKey: 'energia', moodLabel: 'Con Energía', emoji: '⚡', intensity: 8, song: 'Eye of the Tiger', movie: 'Top Gun: Maverick', note: 'Entrenamiento intenso' },
-  { day: 'Vie', moodKey: 'triste', moodLabel: 'Triste', emoji: '😔', intensity: 6, song: 'Fix You', movie: 'Manchester junto al mar', note: 'Reflexión y calma' },
-  { day: 'Sáb', moodKey: 'relax', moodLabel: 'Relax', emoji: '🧘', intensity: 8, song: 'Gymnopédie No. 1', movie: 'El viaje de Chihiro', note: 'Paseo al atardecer' },
-  { day: 'Dom', moodKey: 'feliz', moodLabel: 'Feliz', emoji: '😊', intensity: 7, song: 'Good Vibrations', movie: 'Soul', note: 'Registro actual de hoy', isToday: true }
-];
+// Nombres cortos de los días, en orden de lunes a domingo.
+// El índice 0 corresponde al lunes (la semana empieza el lunes).
+const WEEK_DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+// Emoji neutral que se muestra cuando un día no tiene registro guardado.
+const EMPTY_DAY_EMOJI = '·';
+
+/**
+ * Devuelve la fecha (a medianoche local) del lunes de la semana actual.
+ * Se usa como referencia para situar cada registro en su día de la semana.
+ */
+function getStartOfWeek(referenceDate) {
+  const d = new Date(referenceDate || new Date());
+  d.setHours(0, 0, 0, 0);
+  // getDay(): 0 = domingo ... 6 = sábado. Convertimos a base lunes (0 = lunes).
+  const offsetFromMonday = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - offsetFromMonday);
+  return d;
+}
+
+/**
+ * Obtiene la fecha real de un registro.
+ * Se prioriza el timestamp `id` (Date.now()); si no existe, se intenta
+ * interpretar el campo `date` como respaldo.
+ */
+function getEntryDate(entry) {
+  if (!entry) return null;
+  const ts = Number(entry.id);
+  if (Number.isFinite(ts) && ts > 0) {
+    const fromId = new Date(ts);
+    if (!isNaN(fromId.getTime())) return fromId;
+  }
+  if (entry.date) {
+    const parsed = new Date(entry.date);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return null;
+}
+
+/**
+ * Construye los 7 días de la semana actual (Lun - Dom) combinando:
+ *  - la fecha real del sistema (para saber cuál es "hoy"),
+ *  - los registros reales guardados en Appwrite/localStorage.
+ *
+ * Cada día devuelve: { day, date, dayOfMonth, isToday, entry }
+ * donde `entry` es el registro más reciente de ese día, o null si no hay.
+ */
+function buildCurrentWeek() {
+  const startOfWeek = getStartOfWeek();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Agrupa los registros reales por día, conservando el más reciente de cada uno.
+  const entriesByDay = new Map();
+  (state.history || []).forEach(entry => {
+    const entryDate = getEntryDate(entry);
+    if (!entryDate) return;
+
+    // Solo nos interesan los registros de la semana actual (Lun - Dom).
+    const diffDays = Math.floor((entryDate.setHours(0, 0, 0, 0) - startOfWeek.getTime()) / 86400000);
+    if (diffDays < 0 || diffDays > 6) return;
+
+    const existing = entriesByDay.get(diffDays);
+    if (!existing || Number(entry.id) >= Number(existing.id)) {
+      entriesByDay.set(diffDays, entry);
+    }
+  });
+
+  return WEEK_DAY_NAMES.map((dayName, idx) => {
+    const dayDate = new Date(startOfWeek.getTime());
+    dayDate.setDate(dayDate.getDate() + idx);
+    return {
+      day: dayName,
+      date: dayDate,
+      dayOfMonth: dayDate.getDate(),
+      isToday: dayDate.getTime() === today.getTime(),
+      isFuture: dayDate.getTime() > today.getTime(),
+      entry: entriesByDay.get(idx) || null
+    };
+  });
+}
 
 // Application Bootstrapper
 document.addEventListener('DOMContentLoaded', () => {
@@ -194,18 +265,6 @@ function renderWeeklyCalendar() {
   const topSong = songs.length ? songs[0] : { title: 'Meditación Zen & Música Relajante', artist: 'Mindful Soundscapes', match: '99%', mood: 'Relax' };
   const topMovie = movies.length ? movies[0] : { title: 'Echoes of Calm', genre: 'Cine Indie', duration: '1h 45m', mood: 'Relax' };
 
-  // Sync today's entry (Dom) with current selected mood state
-  const todayIndex = 6;
-  if (DEFAULT_WEEKLY_LOGS[todayIndex]) {
-    DEFAULT_WEEKLY_LOGS[todayIndex].moodKey = state.selectedMood;
-    DEFAULT_WEEKLY_LOGS[todayIndex].moodLabel = currentMoodObj.label;
-    DEFAULT_WEEKLY_LOGS[todayIndex].emoji = currentMoodObj.emoji;
-    DEFAULT_WEEKLY_LOGS[todayIndex].intensity = Math.round(state.intensity / 10);
-    DEFAULT_WEEKLY_LOGS[todayIndex].song = topSong.title;
-    DEFAULT_WEEKLY_LOGS[todayIndex].movie = topMovie.title || topMovie.titulo;
-    DEFAULT_WEEKLY_LOGS[todayIndex].note = state.nlpText || 'Registro actual de hoy';
-  }
-
   // Update hero badge
   if (badgeEl) {
     badgeEl.textContent = `${currentMoodObj.emoji} Estado Actual: ${currentMoodObj.label} (${Math.round(state.intensity / 10)}/10)`;
@@ -224,28 +283,52 @@ function renderWeeklyCalendar() {
     setCover(movieImgEl, resolveCover(topMovie, topMovie.mood || currentMoodObj.label), topMovie.title || topMovie.titulo || 'Póster de película');
   }
 
-  // Render weekly pills widget
+  // Render weekly pills widget (dinámico: día actual real + registros guardados)
   if (container) {
-    container.innerHTML = DEFAULT_WEEKLY_LOGS.map((item, idx) => {
-      const moodColor = MOOD_DATA[item.moodKey]?.color || '#6366f1';
-      const isToday = item.isToday;
+    const week = buildCurrentWeek();
 
-      return `
-        <div class="calendar-day-pill ${isToday ? 'today' : ''}" data-day-idx="${idx}" tabindex="0">
-          <span class="day-name">${item.day}</span>
-          <span class="day-emoji-badge" style="background: ${moodColor}33; border: 1px solid ${moodColor};">${item.emoji}</span>
-          
+    container.innerHTML = week.map((day) => {
+      const entry = day.entry;
+      const classes = ['calendar-day-pill'];
+      if (day.isToday) classes.push('today');
+      if (entry) classes.push('has-entry');
+      if (!entry) classes.push('empty-day');
+
+      // Día sin registro: indicador neutral. Día con registro: emoji real.
+      const moodColor = entry ? (MOOD_DATA[entry.moodKey]?.color || '#6366f1') : 'transparent';
+      const emojiContent = entry
+        ? entry.emoji
+        : EMPTY_DAY_EMOJI;
+
+      const tooltip = entry
+        ? `
           <div class="calendar-tooltip">
             <div class="tooltip-header">
-              <span class="tooltip-day-badge">${item.day}${isToday ? ' (Hoy)' : ''}</span>
-              <strong>${item.emoji} ${item.moodLabel} (${item.intensity}/10)</strong>
+              <span class="tooltip-day-badge">${day.day} ${day.dayOfMonth}${day.isToday ? ' (Hoy)' : ''}</span>
+              <strong>${entry.emoji} ${escapeHtml(entry.moodLabel)} (${entry.intensity}/100)</strong>
             </div>
             <div class="tooltip-body">
-              <p>🎵 <strong>Música:</strong> ${escapeHtml(item.song)}</p>
-              <p>🎬 <strong>Película:</strong> ${escapeHtml(item.movie)}</p>
-              ${item.note ? `<p class="tooltip-note">💬 <em>"${escapeHtml(item.note)}"</em></p>` : ''}
+              ${entry.note ? `<p class="tooltip-note">💬 <em>"${escapeHtml(entry.note)}"</em></p>` : '<p class="tooltip-note">Sin nota adicional.</p>'}
             </div>
           </div>
+        `
+        : `
+          <div class="calendar-tooltip">
+            <div class="tooltip-header">
+              <span class="tooltip-day-badge">${day.day} ${day.dayOfMonth}${day.isToday ? ' (Hoy)' : ''}</span>
+              <strong>Sin registro</strong>
+            </div>
+            <div class="tooltip-body">
+              <p class="tooltip-note">${day.isFuture ? 'Este día aún no ha llegado.' : 'Aún no registraste tu estado de ánimo este día.'}</p>
+            </div>
+          </div>
+        `;
+
+      return `
+        <div class="${classes.join(' ')}" data-day-idx="${day.dayOfMonth}" data-day-name="${day.day}" tabindex="0" aria-label="${day.day} ${day.dayOfMonth}${day.isToday ? ' (hoy)' : ''}${entry ? ': ' + escapeHtml(entry.moodLabel) : ': sin registro'}">
+          <span class="day-name">${day.day}</span>
+          <span class="day-emoji-badge" style="background: ${moodColor}33; border: 1px solid ${entry ? moodColor : 'var(--border-glass)'};">${emojiContent}</span>
+          ${tooltip}
         </div>
       `;
     }).join('');
@@ -505,7 +588,7 @@ function renderRecommendations() {
 
   if (activeMoodIcon) activeMoodIcon.textContent = currentMood.emoji;
   if (activeMoodTitle) activeMoodTitle.textContent = `Modo Emocional: ${currentMood.label}`;
-  if (activeMoodDesc) activeMoodDesc.textContent = `Intensidad: ${state.intensity}/10 • ${currentMood.description}`;
+  if (activeMoodDesc) activeMoodDesc.textContent = `Intensidad: ${state.intensity}/100 • ${currentMood.description}`;
 
   // Container Elements
   const twoColLayout = document.getElementById('recs-two-col-layout');
@@ -904,7 +987,7 @@ function renderHistory() {
     <div class="timeline-item">
       <div class="timeline-emoji">${item.emoji}</div>
       <div class="timeline-details">
-        <h5>${escapeHtml(item.moodLabel)} (Intensidad: ${item.intensity}/10)</h5>
+        <h5>${escapeHtml(item.moodLabel)} (Intensidad: ${item.intensity}/100)</h5>
         <p>${escapeHtml(item.note)}</p>
         <span style="font-size: 0.7rem; color: var(--text-dim);">${escapeHtml(item.date)}</span>
       </div>
