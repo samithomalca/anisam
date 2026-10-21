@@ -82,6 +82,47 @@
     }
   }
 
+  function clearLocalUserData() {
+    ['localStorage', 'sessionStorage'].forEach(function (storageName) {
+      let storage;
+      try {
+        storage = window[storageName];
+        const keysToRemove = [];
+        for (let index = 0; index < storage.length; index += 1) {
+          const key = storage.key(index);
+          if (
+            key === GUEST_CACHE_KEY ||
+            key === 'anisam_favorites' ||
+            (key && key.indexOf('anisam_history_') === 0)
+          ) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(function (key) {
+          try {
+            storage.removeItem(key);
+          } catch (err) {
+            console.warn('[ANISAM] No se pudo eliminar el dato local "' + key + '".', err);
+          }
+        });
+      } catch (err) {
+        console.warn('[ANISAM] No se pudieron limpiar todos los datos locales.', err);
+      }
+    });
+
+    const appState = currentState();
+    if (appState) {
+      appState.favorites = [];
+      appState.favoriteStorageError = null;
+    }
+    try {
+      emitChange([]);
+      if (typeof renderFavorites === 'function') renderFavorites();
+    } catch (err) {
+      console.warn('[ANISAM] No se pudo actualizar la vista tras limpiar los datos locales.', err);
+    }
+  }
+
   function mergeEntries(entries) {
     const map = new Map();
     entries.forEach(function (entry) {
@@ -357,20 +398,35 @@
   }
 
   async function logout() {
-    if (!account || !user || logoutInProgress) return;
+    if (logoutInProgress) return;
     logoutInProgress = true;
     try {
-      await account.deleteSession({ sessionId: 'current' });
-      user = null;
-      stopRealtimeSubscription();
-      pendingRemoteEntries.clear();
-      updateAuthUI();
-      // Limpia la caché del usuario y vuelve a bloquear la app
-      emitChange(readCache(GUEST_CACHE_KEY));
-      resetGateForm();
-      setAuthState('locked');
+      if (account) {
+        await account.deleteSession({ sessionId: 'current' });
+      }
+    } catch (err) {
+      console.warn('[ANISAM] Appwrite no pudo cerrar la sesión; se limpiará el estado local.', err);
     } finally {
-      logoutInProgress = false;
+      user = null;
+      try {
+        stopRealtimeSubscription();
+        pendingRemoteEntries.clear();
+      } catch (err) {
+        console.warn('[ANISAM] No se pudo detener toda la actividad de sesión.', err);
+      }
+      clearLocalUserData();
+      try {
+        updateAuthUI();
+        resetGateForm();
+      } catch (err) {
+        console.warn('[ANISAM] No se pudo actualizar la interfaz de autenticación.', err);
+      } finally {
+        try {
+          setAuthState('locked');
+        } finally {
+          logoutInProgress = false;
+        }
+      }
     }
   }
 
@@ -709,8 +765,14 @@
         try {
           await logout();
         } catch (err) {
-          console.error('[ANISAM] No se pudo cerrar la sesión.', err);
-          showAuthFeedback('No se pudo cerrar la sesión. Revisa tu conexión e inténtalo de nuevo.');
+          console.error('[ANISAM] No se pudo completar la limpieza local al cerrar sesión.', err);
+          user = null;
+          stopRealtimeSubscription();
+          pendingRemoteEntries.clear();
+          clearLocalUserData();
+          updateAuthUI();
+          resetGateForm();
+          setAuthState('locked');
         } finally {
           els.logoutBtn.disabled = false;
         }
