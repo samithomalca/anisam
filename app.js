@@ -80,7 +80,7 @@ const MOOD_DATA = {
   feliz: {
     label: 'Feliz',
     emoji: '😊',
-    color: '#f59e0b',
+    color: '#a1c7ec',
     description: 'Alegre, optimista y radiante',
     habits: [
       { id: 'h1', text: 'Comparte tu buena energía enviando un mensaje positivo a un amigo', done: false },
@@ -91,7 +91,7 @@ const MOOD_DATA = {
   triste: {
     label: 'Triste',
     emoji: '😔',
-    color: '#3b82f6',
+    color: '#789fc8',
     description: 'Sensible, reflexivo o necesitando apoyo',
     habits: [
       { id: 'h1', text: 'Prepara una bebida caliente (té de manzanilla o chocolate)', done: false },
@@ -102,7 +102,7 @@ const MOOD_DATA = {
   energia: {
     label: 'Con Energía',
     emoji: '⚡',
-    color: '#ec4899',
+    color: '#83addb',
     description: 'Motivado, activo y listo para actuar',
     habits: [
       { id: 'h1', text: 'Realiza una rutina rápida de ejercicio de 10 minutos', done: false },
@@ -113,7 +113,7 @@ const MOOD_DATA = {
   relax: {
     label: 'Relax',
     emoji: '🧘',
-    color: '#10b981',
+    color: '#91bdcf',
     description: 'En paz, equilibrado y sereno',
     habits: [
       { id: 'h1', text: 'Haz 5 minutos de respiración diafragmática profunda', done: false },
@@ -124,7 +124,7 @@ const MOOD_DATA = {
   entretenido: {
     label: 'Entretenido',
     emoji: '🎬',
-    color: '#8b5cf6',
+    color: '#9cafe0',
     description: 'Curioso, buscando diversión e intriga',
     habits: [
       { id: 'h1', text: 'Descubre un nuevo dato curioso o documental fascinante', done: false },
@@ -295,7 +295,7 @@ function renderWeeklyCalendar() {
       if (!entry) classes.push('empty-day');
 
       // Día sin registro: indicador neutral. Día con registro: emoji real.
-      const moodColor = entry ? (MOOD_DATA[entry.moodKey]?.color || '#6366f1') : 'transparent';
+      const moodColor = entry ? (MOOD_DATA[entry.moodKey]?.color || '#8ab8e8') : 'transparent';
       const emojiContent = entry
         ? entry.emoji
         : EMPTY_DAY_EMOJI;
@@ -854,7 +854,7 @@ function initAudioPlayer() {
       const height = state.isPlayingAudio 
         ? Math.random() * (canvas.height - 10) + 10 
         : 6;
-      ctx.fillStyle = state.isPlayingAudio ? MOOD_DATA[state.selectedMood]?.color || '#6366f1' : '#4b5563';
+      ctx.fillStyle = state.isPlayingAudio ? MOOD_DATA[state.selectedMood]?.color || '#8ab8e8' : '#71839a';
       ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 3, height);
     }
   }
@@ -1022,8 +1022,9 @@ function renderInsights() {
         labels: ['Feliz', 'Triste', 'Con Energía', 'Relax', 'Entretenido'],
         datasets: [{
           data: [moodCounts.Feliz || 1, moodCounts.Triste || 1, moodCounts.Energia || 1, moodCounts.Relax || 3, moodCounts.Entretenido || 2],
-          backgroundColor: ['#f59e0b', '#3b82f6', '#ec4899', '#10b981', '#8b5cf6'],
-          borderWidth: 0
+          backgroundColor: ['#a1c7ec', '#789fc8', '#83addb', '#91bdcf', '#9cafe0'],
+          borderColor: '#132439',
+          borderWidth: 2
         }]
       },
       options: {
@@ -1048,8 +1049,8 @@ function renderInsights() {
         datasets: [{
           label: 'Intensidad',
           data: dataVals.length ? dataVals : [6, 8, 5, 9, 7],
-          borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          borderColor: '#8ab8e8',
+          backgroundColor: 'rgba(138, 184, 232, 0.12)',
           fill: true,
           tension: 0.4
         }]
@@ -1058,7 +1059,18 @@ function renderInsights() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
-        scales: { y: { min: 1, max: 10 } }
+        scales: {
+          x: {
+            ticks: { color: '#aabbd0' },
+            grid: { color: 'rgba(166, 194, 224, 0.08)' }
+          },
+          y: {
+            min: 1,
+            max: 10,
+            ticks: { color: '#aabbd0' },
+            grid: { color: 'rgba(166, 194, 224, 0.08)' }
+          }
+        }
       }
     });
   }
