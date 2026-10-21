@@ -336,7 +336,7 @@
         <div class="insights-full-container">
           <div class="insights-header">
             <h3><i class="ph ph-chart-pie-slice"></i> Tus Estadísticas</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Estadísticas generales de tus emociones predominantes y contenido consumido.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Calculadas a partir de tus registros emocionales guardados.</p>
           </div>
 
           <div class="insights-charts-grid">
@@ -345,19 +345,21 @@
               <div class="chart-canvas-wrap">
                 <canvas id="donutChartCanvas"></canvas>
               </div>
+              <div class="chart-legend" id="mood-distribution-legend" aria-live="polite"></div>
             </div>
 
             <div class="chart-card">
               <h4>Evolución de Intensidad</h4>
               <div class="chart-canvas-wrap">
                 <canvas id="trendChartCanvas"></canvas>
+                <p class="chart-empty" id="trend-chart-empty" hidden>Registra un estado de ánimo para ver tu evolución.</p>
               </div>
             </div>
 
             <div class="chart-card">
               <h4>Índice de Balance</h4>
-              <div class="stat-summary-number" id="balance-score-val">88/100</div>
-              <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">Excelente estabilidad emocional esta semana</p>
+              <div class="stat-summary-number" id="balance-score-val">—</div>
+              <p class="stat-summary-caption" id="balance-score-caption">Promedio de intensidad de tus registros (0–100).</p>
             </div>
           </div>
         </div>

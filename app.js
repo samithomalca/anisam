@@ -1000,29 +1000,68 @@ function renderInsights() {
   const donutCanvas = document.getElementById('donutChartCanvas');
   const trendCanvas = document.getElementById('trendChartCanvas');
   const balanceVal = document.getElementById('balance-score-val');
+  const balanceCaption = document.getElementById('balance-score-caption');
+  const moodLegend = document.getElementById('mood-distribution-legend');
+  const trendEmpty = document.getElementById('trend-chart-empty');
+  const history = (state.history || []).filter(function (entry) {
+    return !!entry && typeof entry === 'object';
+  });
+  const intensityEntries = history.filter(function (entry) {
+    const intensity = Number(entry && entry.intensity);
+    return Number.isFinite(intensity) && intensity >= 0 && intensity <= 100;
+  });
 
   if (balanceVal) {
-    const score = Math.min(100, Math.max(60, 75 + (state.history.length * 2)));
-    balanceVal.textContent = `${score}/100`;
+    if (intensityEntries.length) {
+      const average = intensityEntries.reduce(function (total, entry) {
+        return total + Number(entry.intensity);
+      }, 0) / intensityEntries.length;
+      balanceVal.textContent = `${Math.round(average * 10) / 10}/100`;
+      if (balanceCaption) {
+        balanceCaption.textContent = `Intensidad promedio de ${intensityEntries.length} ${intensityEntries.length === 1 ? 'registro' : 'registros'} (0–100).`;
+      }
+    } else {
+      balanceVal.textContent = '—';
+      if (balanceCaption) balanceCaption.textContent = 'Aún no hay registros para calcular el promedio.';
+    }
   }
 
   if (donutCanvas && window.Chart) {
     if (window.donutChartInstance) window.donutChartInstance.destroy();
 
-    const moodCounts = { Feliz: 0, Triste: 0, Energia: 0, Relax: 0, Entretenido: 0 };
-    state.history.forEach(h => {
-      const key = h.moodLabel || 'Relax';
-      if (moodCounts[key] !== undefined) moodCounts[key]++;
-      else moodCounts.Relax++;
+    const moodCounts = new Map();
+    history.forEach(function (entry) {
+      const category = getMoodCategory(entry);
+      const current = moodCounts.get(category.key) || { label: category.label, count: 0 };
+      current.count++;
+      moodCounts.set(category.key, current);
+    });
+
+    const moods = Array.from(moodCounts.entries()).map(function (item) {
+      return { key: item[0], label: item[1].label, count: item[1].count };
+    });
+    const knownOrder = Object.keys(MOOD_DATA);
+    moods.sort(function (a, b) {
+      const aIndex = knownOrder.indexOf(a.key);
+      const bIndex = knownOrder.indexOf(b.key);
+      if (aIndex !== -1 || bIndex !== -1) {
+        return (aIndex === -1 ? knownOrder.length : aIndex) - (bIndex === -1 ? knownOrder.length : bIndex);
+      }
+      return a.label.localeCompare(b.label, 'es');
+    });
+
+    const moodColors = ['#a1c7ec', '#789fc8', '#83addb', '#91bdcf', '#9cafe0', '#718ba9'];
+    const colors = moods.map(function (mood, index) {
+      return MOOD_DATA[mood.key] ? MOOD_DATA[mood.key].color : moodColors[index % moodColors.length];
     });
 
     window.donutChartInstance = new Chart(donutCanvas, {
       type: 'doughnut',
       data: {
-        labels: ['Feliz', 'Triste', 'Con Energía', 'Relax', 'Entretenido'],
+        labels: moods.map(function (mood) { return mood.label; }),
         datasets: [{
-          data: [moodCounts.Feliz || 1, moodCounts.Triste || 1, moodCounts.Energia || 1, moodCounts.Relax || 3, moodCounts.Entretenido || 2],
-          backgroundColor: ['#a1c7ec', '#789fc8', '#83addb', '#91bdcf', '#9cafe0'],
+          data: moods.map(function (mood) { return mood.count; }),
+          backgroundColor: colors,
           borderColor: '#132439',
           borderWidth: 2
         }]
@@ -1030,29 +1069,100 @@ function renderInsights() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } }
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const count = Number(context.raw) || 0;
+                const percentage = history.length ? (count / history.length) * 100 : 0;
+                return `${context.label}: ${count} (${percentage.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%)`;
+              }
+            }
+          }
+        }
       }
     });
+
+    if (moodLegend) {
+      moodLegend.replaceChildren();
+      if (!moods.length) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'chart-empty';
+        emptyMessage.textContent = 'Aún no hay registros emocionales.';
+        moodLegend.appendChild(emptyMessage);
+      } else {
+        moods.forEach(function (mood, index) {
+          const row = document.createElement('div');
+          row.className = 'chart-legend-item';
+
+          const label = document.createElement('span');
+          label.className = 'chart-legend-label';
+          const swatch = document.createElement('span');
+          swatch.className = 'chart-legend-swatch';
+          swatch.style.backgroundColor = colors[index];
+          const name = document.createElement('span');
+          name.textContent = mood.label;
+          label.append(swatch, name);
+
+          const count = document.createElement('span');
+          count.className = 'chart-legend-count';
+          count.textContent = String(mood.count);
+
+          const percentage = document.createElement('span');
+          percentage.className = 'chart-legend-percentage';
+          percentage.textContent = `${((mood.count / history.length) * 100).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+
+          row.append(label, count, percentage);
+          moodLegend.appendChild(row);
+        });
+      }
+    }
   }
 
   if (trendCanvas && window.Chart) {
     if (window.trendChartInstance) window.trendChartInstance.destroy();
 
-    const last5 = state.history.slice(0, 5).reverse();
-    const labels = last5.map(h => h.date.split(',')[0]);
-    const dataVals = last5.map(h => parseInt(h.intensity) || 7);
+    const chronologicalEntries = intensityEntries.map(function (entry, index) {
+      const date = getEntryDate(entry);
+      return { entry: entry, index: index, date: date };
+    }).sort(function (a, b) {
+      const aTime = a.date ? a.date.getTime() : Number(a.entry.id) || a.index;
+      const bTime = b.date ? b.date.getTime() : Number(b.entry.id) || b.index;
+      return aTime - bTime;
+    });
+    const labels = chronologicalEntries.map(function (item) {
+      if (!item.date) return item.entry.date || 'Registro';
+      return item.date.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    });
+    const dataVals = chronologicalEntries.map(function (item) {
+      return Number(item.entry.intensity);
+    });
+    const minValue = dataVals.length ? Math.min.apply(null, dataVals) : 0;
+    const maxValue = dataVals.length ? Math.max.apply(null, dataVals) : 100;
+    const padding = dataVals.length ? Math.max(5, (maxValue - minValue) * 0.1) : 0;
+    const yMin = dataVals.length ? Math.max(0, minValue - padding) : 0;
+    const yMax = dataVals.length ? Math.min(100, maxValue + padding) : 100;
+    if (trendEmpty) trendEmpty.hidden = dataVals.length > 0;
 
     window.trendChartInstance = new Chart(trendCanvas, {
       type: 'line',
       data: {
-        labels: labels.length ? labels : ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],
+        labels: labels,
         datasets: [{
           label: 'Intensidad',
-          data: dataVals.length ? dataVals : [6, 8, 5, 9, 7],
+          data: dataVals,
           borderColor: '#8ab8e8',
           backgroundColor: 'rgba(138, 184, 232, 0.12)',
           fill: true,
-          tension: 0.4
+          tension: 0.25,
+          pointRadius: 3,
+          pointHoverRadius: 5
         }]
       },
       options: {
@@ -1065,8 +1175,8 @@ function renderInsights() {
             grid: { color: 'rgba(166, 194, 224, 0.08)' }
           },
           y: {
-            min: 1,
-            max: 10,
+            min: yMin,
+            max: yMax,
             ticks: { color: '#aabbd0' },
             grid: { color: 'rgba(166, 194, 224, 0.08)' }
           }
@@ -1074,6 +1184,40 @@ function renderInsights() {
       }
     });
   }
+}
+
+function getMoodCategory(entry) {
+  function normalize(value) {
+    return String(value || '')
+      .trim()
+      .toLocaleLowerCase('es')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ');
+  }
+
+  const aliases = { 'con energia': 'energia' };
+  function normalizeMoodName(value) {
+    const normalized = normalize(value);
+    return aliases[normalized] || normalized;
+  }
+
+  const normalizedKey = normalizeMoodName(entry.moodKey);
+  const normalizedLabel = normalizeMoodName(entry.moodLabel);
+  const knownKey = MOOD_DATA[normalizedKey] ? normalizedKey : null;
+  const knownLabel = Object.keys(MOOD_DATA).find(function (moodKey) {
+    return normalizeMoodName(MOOD_DATA[moodKey].label) === normalizedLabel;
+  });
+  const moodKey = knownLabel || knownKey;
+
+  if (moodKey) return { key: moodKey, label: MOOD_DATA[moodKey].label };
+
+  const categoryLabel = String(entry.moodLabel || entry.moodKey || 'Sin categoría').trim();
+  return {
+    key: 'custom:' + normalize(categoryLabel),
+    label: categoryLabel || 'Sin categoría'
+  };
 }
 
 // Modal Dialog Helpers

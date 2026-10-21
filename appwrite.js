@@ -27,6 +27,7 @@
   const GUEST_CACHE_KEY = 'anisam_history';
   const PAGE_LIMIT = 100;
   const SDK = window.Appwrite || null;
+  const pendingRemoteEntries = new Map();
 
   const isConfigured =
     !!SDK &&
@@ -37,6 +38,8 @@
   let account = null;
   let tablesDB = null;
   let user = null; // sesión activa de Appwrite (null = invitado)
+  let realtimeSubscription = null;
+  let realtimeRefreshQueue = Promise.resolve();
 
   // Auth Guard
   let authState = 'loading';   // 'loading' | 'locked' | 'unlocked'
@@ -135,12 +138,33 @@
   // Operaciones con Appwrite
   // ------------------------------------------------------------------
   async function fetchRemoteRows() {
-    const response = await tablesDB.listRows({
-      databaseId: CFG.databaseId,
-      tableId: CFG.tableId,
-      queries: [SDK.Query.orderDesc('$createdAt'), SDK.Query.limit(PAGE_LIMIT)]
-    });
-    return response.rows || [];
+    const rows = [];
+    let cursor = null;
+
+    while (true) {
+      const queries = [
+        SDK.Query.orderDesc('$createdAt'),
+        SDK.Query.limit(PAGE_LIMIT)
+      ];
+      if (cursor) queries.push(SDK.Query.cursorAfter(cursor));
+
+      const response = await tablesDB.listRows({
+        databaseId: CFG.databaseId,
+        tableId: CFG.tableId,
+        queries: queries
+      });
+      const page = response.rows || [];
+      rows.push.apply(rows, page);
+
+      if (page.length < PAGE_LIMIT) break;
+      const lastRow = page[page.length - 1];
+      if (!lastRow || !lastRow.$id || lastRow.$id === cursor) {
+        throw new Error('La paginación de Appwrite no avanzó al siguiente lote de registros.');
+      }
+      cursor = lastRow.$id;
+    }
+
+    return rows;
   }
 
   async function createRemoteRow(entry) {
@@ -179,17 +203,76 @@
     });
 
     if (pending.length) {
-      await Promise.allSettled(pending.slice(0, PAGE_LIMIT).map(createRemoteRow));
+      pendingRemoteEntries.clear();
+      for (let offset = 0; offset < pending.length; offset += PAGE_LIMIT) {
+        const pendingBatch = pending.slice(offset, offset + PAGE_LIMIT);
+        const results = await Promise.allSettled(pendingBatch.map(createRemoteRow));
+        results.forEach(function (result, index) {
+          if (result.status === 'rejected') {
+            pendingRemoteEntries.set(String(pendingBatch[index].id), pendingBatch[index]);
+            console.warn('[ANISAM] No se pudo sincronizar un registro pendiente.', result.reason);
+          }
+        });
+      }
     }
 
     const rows = pending.length ? await fetchRemoteRows() : remoteRows;
-    const merged = mergeEntries(rows.map(rowToEntry).concat(candidates));
+    const remoteIdsAfterSync = new Set(rows.map(function (row) { return String(row.clientId); }));
+    pendingRemoteEntries.forEach(function (_entry, id) {
+      if (remoteIdsAfterSync.has(id)) pendingRemoteEntries.delete(id);
+    });
+    const merged = mergeEntries(candidates.concat(rows.map(rowToEntry)));
 
     writeCache(key, merged);
     if (importGuest && guest.length) {
       try { localStorage.removeItem(GUEST_CACHE_KEY); } catch (err) { /* noop */ }
     }
     emitChange(merged);
+  }
+
+  async function refreshFromRemote() {
+    if (!user) return;
+    const userId = user.$id;
+    const rows = await fetchRemoteRows();
+    if (!user || user.$id !== userId) return;
+
+    const remoteIds = new Set(rows.map(function (row) { return String(row.clientId); }));
+    const unsynced = [];
+    pendingRemoteEntries.forEach(function (entry, id) {
+      if (remoteIds.has(id)) {
+        pendingRemoteEntries.delete(id);
+      } else {
+        unsynced.push(entry);
+      }
+    });
+
+    const merged = mergeEntries(unsynced.concat(rows.map(rowToEntry)));
+    writeCache(cacheKey(userId), merged);
+    emitChange(merged);
+  }
+
+  function stopRealtimeSubscription() {
+    if (!realtimeSubscription) return;
+    realtimeSubscription.unsubscribe();
+    realtimeSubscription = null;
+  }
+
+  function startRealtimeSubscription() {
+    if (!user || !client || typeof client.subscribe !== 'function') return;
+    stopRealtimeSubscription();
+
+    const channel = 'tablesdb.' + CFG.databaseId + '.tables.' + CFG.tableId + '.rows';
+    try {
+      realtimeSubscription = client.subscribe(channel, function () {
+        realtimeRefreshQueue = realtimeRefreshQueue
+          .then(refreshFromRemote)
+          .catch(function (err) {
+            console.warn('[ANISAM] No se pudo actualizar el historial en tiempo real.', err);
+          });
+      });
+    } catch (err) {
+      console.warn('[ANISAM] No se pudo suscribir a los cambios en tiempo real de Appwrite.', err);
+    }
   }
 
   // ------------------------------------------------------------------
@@ -269,6 +352,7 @@
     } catch (err) {
       console.warn('[ANISAM] No se pudo sincronizar con Appwrite.', err);
     }
+    startRealtimeSubscription();
   }
 
   async function logout() {
@@ -278,6 +362,8 @@
       console.warn('[ANISAM] No se pudo cerrar la sesión.', err);
     }
     user = null;
+    stopRealtimeSubscription();
+    pendingRemoteEntries.clear();
     updateAuthUI();
     // Limpia la caché del usuario y vuelve a bloquear la app
     emitChange(readCache(GUEST_CACHE_KEY));
@@ -301,6 +387,7 @@
       } catch (err) {
         console.warn('[ANISAM] No se pudo sincronizar con Appwrite.', err);
       }
+      startRealtimeSubscription();
       return user;
     } catch (err) {
       // 401 = no hay sesión válida -> pantalla de acceso
@@ -330,8 +417,10 @@
 
     try {
       await createRemoteRow(entry);
+      pendingRemoteEntries.delete(String(entry.id));
       return { saved: true, remote: true, error: null };
     } catch (err) {
+      pendingRemoteEntries.set(String(entry.id), entry);
       console.warn('[ANISAM] Registro guardado localmente; se sincronizará luego.', err);
       return { saved: true, remote: false, error: err };
     }
@@ -339,12 +428,13 @@
 
   async function clearEntries() {
     writeCache(cacheKey(user ? user.$id : null), []);
+    pendingRemoteEntries.clear();
     try { localStorage.removeItem(GUEST_CACHE_KEY); } catch (err) { /* noop */ }
 
     if (!user) return;
     try {
       const rows = await fetchRemoteRows();
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         rows.map(function (row) {
           return tablesDB.deleteRow({
             databaseId: CFG.databaseId,
@@ -353,6 +443,10 @@
           });
         })
       );
+      const failures = results.filter(function (result) { return result.status === 'rejected'; });
+      if (failures.length) {
+        console.warn('[ANISAM] No se pudieron eliminar todos los registros remotos.', failures);
+      }
     } catch (err) {
       console.warn('[ANISAM] No se pudo limpiar el historial remoto.', err);
     }
