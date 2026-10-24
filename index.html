@@ -142,7 +142,7 @@
           <div class="feature-card">
             <div class="feature-icon"><i class="ph ph-pulse"></i></div>
             <h4>Detector Emocional</h4>
-            <p>Selecciona tu emoción o descríbela en tus propias palabras para un diagnóstico rápido.</p>
+            <p>Selecciona la emoción que mejor te represente para un diagnóstico rápido.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon"><i class="ph ph-music-notes"></i></div>
@@ -163,7 +163,7 @@
       <section id="screen-mood-reg" class="screen">
         <div class="screen-header">
           <h2>Registro de Estado de Ánimo</h2>
-          <p>¿Cómo te sientes en este instante? Elige tu emoción o escribe brevemente tus palabras clave.</p>
+          <p>¿Cómo te sientes en este instante? Elige la emoción que mejor te represente.</p>
         </div>
 
         <div class="mood-selector-container">
@@ -204,22 +204,6 @@
               <span class="intensity-value-badge" id="intensity-val">70/100</span>
             </div>
             <input type="range" min="0" max="100" value="70" class="intensity-slider" id="intensity-slider">
-          </div>
-
-          <!-- Free Text / Keyword NLP Field -->
-          <div class="nlp-input-section">
-            <div class="nlp-label">
-              <span><i class="ph ph-chat-teardrop-text"></i> Interpretación opcional mediante palabras clave</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Sugerencia automática por IA</span>
-            </div>
-            <textarea 
-              class="nlp-textarea" 
-              id="nlp-textarea"
-              placeholder="Ejemplo: Tuve un día pesado en el trabajo y solo quiero relajarme viendo una buena película..."
-            ></textarea>
-            <div class="nlp-detected-tags" id="detected-tags">
-              <!-- Live tags rendered here via JS -->
-            </div>
           </div>
 
           <!-- Action Button -->

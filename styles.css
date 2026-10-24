@@ -787,60 +787,6 @@ body {
   cursor: pointer;
 }
 
-/* Free Text NLP Input Section */
-.nlp-input-section {
-  margin-bottom: 1.75rem;
-}
-
-.nlp-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.nlp-textarea {
-  width: 100%;
-  min-height: 85px;
-  background: rgba(5, 16, 29, 0.4);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--radius-md);
-  padding: 0.85rem;
-  color: var(--text-main);
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  resize: vertical;
-  outline: none;
-  transition: border-color var(--transition-fast);
-}
-
-.nlp-textarea:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-.nlp-detected-tags {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-
-.keyword-tag {
-  background: rgba(138, 184, 232, 0.12);
-  border: 1px solid rgba(138, 184, 232, 0.24);
-  color: #c1daf2;
-  font-size: 0.725rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  animation: fadeIn 0.3s ease;
-}
-
 .form-action-footer {
   text-align: center;
 }

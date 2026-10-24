@@ -9,7 +9,6 @@ const state = {
   activeScreen: 'screen-welcome',
   selectedMood: 'feliz',
   intensity: 70,
-  nlpText: '',
   activeFilter: 'all',
   habits: [],
   history: JSON.parse(localStorage.getItem('anisam_history') || '[]'),
@@ -163,26 +162,6 @@ const MOOD_DATA = {
       { id: 'h3', text: 'Mira las sugerencias de películas recomendadas para hoy', done: false }
     ]
   }
-};
-
-// Keyword Sentiment Dictionary
-const KEYWORD_MAP = {
-  pesado: 'relax',
-  relajarme: 'relax',
-  descansar: 'relax',
-  estrés: 'relax',
-  estresado: 'triste',
-  cansado: 'relax',
-  alegre: 'feliz',
-  contento: 'feliz',
-  fiesta: 'energia',
-  ejercicio: 'energia',
-  motivado: 'energia',
-  triste: 'triste',
-  solo: 'triste',
-  película: 'entretenido',
-  diversión: 'entretenido',
-  aburrido: 'entretenido'
 };
 
 // Nombres cortos de los días, en orden de lunes a domingo.
@@ -436,8 +415,6 @@ function initMoodForm() {
   const moodCards = document.querySelectorAll('.mood-card');
   const intensitySlider = document.getElementById('intensity-slider');
   const intensityVal = document.getElementById('intensity-val');
-  const nlpTextarea = document.getElementById('nlp-textarea');
-  const detectedTagsContainer = document.getElementById('detected-tags');
 
   // Helper to visually update active mood card and body attribute
   function updateMoodCardVisual(moodKey) {
@@ -478,37 +455,6 @@ function initMoodForm() {
     });
   }
 
-  // 3. Keyword Sentiment Analyzer
-  if (nlpTextarea) {
-    nlpTextarea.addEventListener('input', (e) => {
-      const text = e.target.value.toLowerCase();
-      state.nlpText = e.target.value;
-      
-      const detectedKeywords = [];
-      Object.keys(KEYWORD_MAP).forEach(kw => {
-        if (text.includes(kw)) {
-          detectedKeywords.push(kw);
-          const suggestedMood = KEYWORD_MAP[kw];
-          if (suggestedMood && state.selectedMood !== suggestedMood) {
-            updateMoodCardVisual(suggestedMood);
-            const midpoint = MOOD_MIDPOINTS[suggestedMood] || 70;
-            state.intensity = midpoint;
-            if (intensitySlider) intensitySlider.value = midpoint;
-            if (intensityVal) intensityVal.textContent = `${midpoint}/100`;
-          }
-        }
-      });
-
-      // Render Detected Tags
-      if (detectedTagsContainer) {
-        detectedTagsContainer.innerHTML = detectedKeywords.map(kw => `
-          <span class="keyword-tag">✨ ${kw} &rarr; ${MOOD_DATA[KEYWORD_MAP[kw]]?.label}</span>
-        `).join('');
-      }
-      renderWeeklyCalendar();
-    });
-  }
-
   // Acción principal -> Guardar la entrada y actualizar historial/estadísticas
   const btnSaveMood = document.getElementById('btn-save-mood');
   const saveFeedback = document.getElementById('save-feedback');
@@ -537,7 +483,7 @@ function initMoodForm() {
         moodLabel: currentMoodObj.label,
         emoji: currentMoodObj.emoji,
         intensity: state.intensity,
-        note: state.nlpText || 'Registro sin notas adicionales'
+        note: 'Registro sin notas adicionales'
       };
 
       // 1) Actualiza el estado local de inmediato (historial y estadísticas)
@@ -579,10 +525,6 @@ function initMoodForm() {
         showSaveFeedback('¡Estado de ánimo guardado! ' + currentMoodObj.emoji + ' ' + currentMoodObj.label, 'ok');
       }
 
-      // 4) Limpia el campo de nota para el siguiente registro
-      state.nlpText = '';
-      if (nlpTextarea) nlpTextarea.value = '';
-      if (detectedTagsContainer) detectedTagsContainer.innerHTML = '';
     });
   }
 }
