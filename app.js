@@ -8,7 +8,7 @@ const initialFavorites = loadFavorites();
 const state = {
   activeScreen: 'screen-welcome',
   selectedMood: 'feliz',
-  intensity: 70,
+  intensity: 90,
   activeFilter: 'all',
   habits: [],
   history: JSON.parse(localStorage.getItem('anisam_history') || '[]'),
@@ -54,8 +54,8 @@ const MOOD_MIDPOINTS = {
   triste: 10,       // 0 a 20
   relax: 30,        // 21 a 40
   entretenido: 50,  // 41 a 60
-  feliz: 70,        // 61 a 80
-  energia: 90       // 81 a 100
+  energia: 70,      // 61 a 80
+  feliz: 90         // 81 a 100
 };
 
 // Function for Slider Range -> Mood Card Mapping
@@ -64,8 +64,8 @@ function getMoodFromIntensity(val) {
   if (v <= 20) return 'triste';
   if (v <= 40) return 'relax';
   if (v <= 60) return 'entretenido';
-  if (v <= 80) return 'feliz';
-  return 'energia';
+  if (v <= 80) return 'energia';
+  return 'feliz';
 }
 
 // Helper Cover Asset per Mood
@@ -76,9 +76,12 @@ const MOOD_COVERS = {
   Feliz: 'assets/happy_series_poster.svg',
   Triste: 'assets/movie_poster_echoes.svg',
   Energia: 'assets/energetic_synth_art.svg',
+  Alegre: 'assets/energetic_synth_art.svg',
   Relax: 'assets/musica_relajante.svg',
+  Calmado: 'assets/musica_relajante.svg',
   Sereno: 'assets/musica_relajante.svg',
   Entretenido: 'assets/happy_series_art.svg',
+  Contento: 'assets/happy_series_art.svg',
   'De buen ánimo': 'assets/happy_series_art.svg'
 };
 
@@ -121,11 +124,11 @@ const MOOD_DATA = {
     ]
   },
   relax: {
-    label: 'Sereno',
+    label: 'Calmado',
     catalogMood: 'Relax',
-    emoji: '😌',
+    emoji: '😐',
     color: '#91bdcf',
-    description: 'En calma, en paz y en equilibrio',
+    description: 'Neutral y en calma, sin emociones intensas',
     habits: [
       { id: 'h1', text: 'Haz 5 minutos de respiración diafragmática profunda', done: false },
       { id: 'h2', text: 'Da una caminata corta observando la naturaleza', done: false },
@@ -133,11 +136,11 @@ const MOOD_DATA = {
     ]
   },
   entretenido: {
-    label: 'De buen ánimo',
+    label: 'Contento',
     catalogMood: 'Entretenido',
     emoji: '🙂',
     color: '#9cafe0',
-    description: 'De buen ánimo, curioso y disfrutando el momento',
+    description: 'Con buen ánimo y disfrutando el momento',
     habits: [
       { id: 'h1', text: 'Descubre un nuevo dato curioso o documental fascinante', done: false },
       { id: 'h2', text: 'Juega una partida rápida o resuelve un acertijo', done: false },
@@ -145,10 +148,11 @@ const MOOD_DATA = {
     ]
   },
   energia: {
-    label: 'Con Energía',
-    emoji: '🚀',
+    label: 'Alegre',
+    catalogMood: 'Energia',
+    emoji: '😊',
     color: '#83addb',
-    description: 'Motivado, activo y con ganas de actuar',
+    description: 'Animado, positivo y con ganas de actuar',
     habits: [
       { id: 'h1', text: 'Realiza una rutina rápida de ejercicio de 10 minutos', done: false },
       { id: 'h2', text: 'Avanza en tu proyecto personal más desafiante', done: false },
@@ -1287,7 +1291,13 @@ function getMoodCategory(entry) {
       .replace(/\s+/g, ' ');
   }
 
-  const aliases = { 'con energia': 'energia', relax: 'sereno', entretenido: 'de buen animo' };
+  const aliases = {
+    'con energia': 'alegre',
+    relax: 'calmado',
+    sereno: 'calmado',
+    entretenido: 'contento',
+    'de buen animo': 'contento'
+  };
   function normalizeMoodName(value) {
     const normalized = normalize(value);
     return aliases[normalized] || normalized;
