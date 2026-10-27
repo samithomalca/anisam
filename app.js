@@ -77,7 +77,9 @@ const MOOD_COVERS = {
   Triste: 'assets/movie_poster_echoes.svg',
   Energia: 'assets/energetic_synth_art.svg',
   Relax: 'assets/musica_relajante.svg',
-  Entretenido: 'assets/happy_series_art.svg'
+  Sereno: 'assets/musica_relajante.svg',
+  Entretenido: 'assets/happy_series_art.svg',
+  'De buen ánimo': 'assets/happy_series_art.svg'
 };
 
 /**
@@ -107,44 +109,23 @@ function coverImgAttrs(url, alt) {
 
 // Emotional Dataset Configuration & Daily Habits
 const MOOD_DATA = {
-  feliz: {
-    label: 'Feliz',
-    emoji: '😊',
-    color: '#a1c7ec',
-    description: 'Alegre, optimista y radiante',
-    habits: [
-      { id: 'h1', text: 'Comparte tu buena energía enviando un mensaje positivo a un amigo', done: false },
-      { id: 'h2', text: 'Escucha una playlist llena de ritmo y vibra arriba', done: false },
-      { id: 'h3', text: 'Apunta 3 logros recientes de los que te sientas orgulloso', done: false }
-    ]
-  },
   triste: {
     label: 'Triste',
-    emoji: '😔',
+    emoji: '😢',
     color: '#789fc8',
-    description: 'Sensible, reflexivo o necesitando apoyo',
+    description: 'Desanimado o melancólico; quizá necesites apoyo',
     habits: [
       { id: 'h1', text: 'Prepara una bebida caliente (té de manzanilla o chocolate)', done: false },
       { id: 'h2', text: 'Tómate 15 minutos sin pantallas ni presiones externas', done: false },
       { id: 'h3', text: 'Escucha música suave y reconfortante para procesar tus emociones', done: false }
     ]
   },
-  energia: {
-    label: 'Con Energía',
-    emoji: '⚡',
-    color: '#83addb',
-    description: 'Motivado, activo y listo para actuar',
-    habits: [
-      { id: 'h1', text: 'Realiza una rutina rápida de ejercicio de 10 minutos', done: false },
-      { id: 'h2', text: 'Avanza en tu proyecto personal más desafiante', done: false },
-      { id: 'h3', text: 'Escucha un podcast de ritmo dinámico', done: false }
-    ]
-  },
   relax: {
-    label: 'Relax',
-    emoji: '🧘',
+    label: 'Sereno',
+    catalogMood: 'Relax',
+    emoji: '😌',
     color: '#91bdcf',
-    description: 'En paz, equilibrado y sereno',
+    description: 'En calma, en paz y en equilibrio',
     habits: [
       { id: 'h1', text: 'Haz 5 minutos de respiración diafragmática profunda', done: false },
       { id: 'h2', text: 'Da una caminata corta observando la naturaleza', done: false },
@@ -152,14 +133,37 @@ const MOOD_DATA = {
     ]
   },
   entretenido: {
-    label: 'Entretenido',
-    emoji: '🎬',
+    label: 'De buen ánimo',
+    catalogMood: 'Entretenido',
+    emoji: '🙂',
     color: '#9cafe0',
-    description: 'Curioso, buscando diversión e intriga',
+    description: 'De buen ánimo, curioso y disfrutando el momento',
     habits: [
       { id: 'h1', text: 'Descubre un nuevo dato curioso o documental fascinante', done: false },
       { id: 'h2', text: 'Juega una partida rápida o resuelve un acertijo', done: false },
       { id: 'h3', text: 'Mira las sugerencias de películas recomendadas para hoy', done: false }
+    ]
+  },
+  energia: {
+    label: 'Con Energía',
+    emoji: '🚀',
+    color: '#83addb',
+    description: 'Motivado, activo y con ganas de actuar',
+    habits: [
+      { id: 'h1', text: 'Realiza una rutina rápida de ejercicio de 10 minutos', done: false },
+      { id: 'h2', text: 'Avanza en tu proyecto personal más desafiante', done: false },
+      { id: 'h3', text: 'Escucha un podcast de ritmo dinámico', done: false }
+    ]
+  },
+  feliz: {
+    label: 'Feliz',
+    emoji: '😄',
+    color: '#a1c7ec',
+    description: 'Alegre, optimista y radiante',
+    habits: [
+      { id: 'h1', text: 'Comparte tu buena energía enviando un mensaje positivo a un amigo', done: false },
+      { id: 'h2', text: 'Escucha una playlist llena de ritmo y vibra arriba', done: false },
+      { id: 'h3', text: 'Apunta 3 logros recientes de los que te sientas orgulloso', done: false }
     ]
   }
 };
@@ -532,7 +536,7 @@ function initMoodForm() {
 // Data Query Helpers
 function getSongsForMood(moodKey) {
   const currentMoodObj = MOOD_DATA[moodKey] || MOOD_DATA.relax;
-  let targetMoodName = currentMoodObj.label;
+  let targetMoodName = currentMoodObj.catalogMood || currentMoodObj.label;
   if (targetMoodName === 'Con Energía') targetMoodName = 'Energia';
 
   if (typeof songsCatalog !== 'undefined' && Array.isArray(songsCatalog)) {
@@ -544,7 +548,7 @@ function getSongsForMood(moodKey) {
 
 function getMoviesForMood(moodKey) {
   const currentMoodObj = MOOD_DATA[moodKey] || MOOD_DATA.relax;
-  let targetMoodName = currentMoodObj.label;
+  let targetMoodName = currentMoodObj.catalogMood || currentMoodObj.label;
   if (targetMoodName === 'Con Energía') targetMoodName = 'Energia';
 
   if (typeof moviesCatalog !== 'undefined' && Array.isArray(moviesCatalog)) {
@@ -1283,13 +1287,13 @@ function getMoodCategory(entry) {
       .replace(/\s+/g, ' ');
   }
 
-  const aliases = { 'con energia': 'energia' };
+  const aliases = { 'con energia': 'energia', relax: 'sereno', entretenido: 'de buen animo' };
   function normalizeMoodName(value) {
     const normalized = normalize(value);
     return aliases[normalized] || normalized;
   }
 
-  const normalizedKey = normalizeMoodName(entry.moodKey);
+  const normalizedKey = normalize(entry.moodKey);
   const normalizedLabel = normalizeMoodName(entry.moodLabel);
   const knownKey = MOOD_DATA[normalizedKey] ? normalizedKey : null;
   const knownLabel = Object.keys(MOOD_DATA).find(function (moodKey) {
