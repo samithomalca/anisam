@@ -211,6 +211,22 @@ function getEntryDate(entry) {
   return null;
 }
 
+function getLatestMoodEntry() {
+  return (state.history || [])
+    .filter(entry => entry && typeof entry === 'object')
+    .slice()
+    .sort((a, b) => {
+      const aTime = getEntryDate(a)?.getTime() || 0;
+      const bTime = getEntryDate(b)?.getTime() || 0;
+      return bTime - aTime;
+    })[0] || null;
+}
+
+function getRecommendationsMoodKey() {
+  const latestEntry = getLatestMoodEntry();
+  return latestEntry ? getMoodCategory(latestEntry).key : state.selectedMood;
+}
+
 /**
  * Construye los 7 días de la semana actual (Lun - Dom) combinando:
  *  - la fecha real del sistema (para saber cuál es "hoy"),
@@ -380,6 +396,7 @@ function switchScreen(screenId) {
     renderHistory();
     renderHabits();
   }
+  if (screenId === 'screen-recommendations') renderRecommendations();
   if (screenId === 'screen-favorites') renderFavorites();
 }
 
@@ -466,6 +483,7 @@ function initMoodForm() {
   // Acción principal -> Guardar la entrada y actualizar historial/estadísticas
   const btnSaveMood = document.getElementById('btn-save-mood');
   const saveFeedback = document.getElementById('save-feedback');
+  const btnViewRecommendations = document.getElementById('btn-view-recommendations');
 
   function showSaveFeedback(message, type) {
     if (!saveFeedback) return;
@@ -494,11 +512,8 @@ function initMoodForm() {
         note: 'Registro sin notas adicionales'
       };
 
-      // 1) Actualiza el estado local de inmediato (historial y estadísticas)
-      state.history.unshift(newEntry);
-      state.habits = currentMoodObj.habits.map(h => ({ ...h }));
-
       setSaving(true);
+      if (btnViewRecommendations) btnViewRecommendations.hidden = true;
       showSaveFeedback('', '');
 
       // 2) Persiste: Appwrite si hay sesión; si no, localStorage
@@ -507,18 +522,12 @@ function initMoodForm() {
         if (window.AnisamBackend) {
           result = await window.AnisamBackend.onEntryAdded(newEntry);
         } else {
-          localStorage.setItem('anisam_history', JSON.stringify(state.history));
+          localStorage.setItem('anisam_history', JSON.stringify([newEntry].concat(state.history)));
         }
       } catch (err) {
         console.error('[ANISAM] Error al guardar el registro:', err);
         result = { saved: false, remote: false, error: err };
       }
-
-      // 3) Refresca historial, estadísticas y calendario
-      renderWeeklyCalendar();
-      renderHistory();
-      renderInsights();
-      renderHabits();
 
       setSaving(false);
 
@@ -527,6 +536,16 @@ function initMoodForm() {
         return;
       }
 
+      state.history.unshift(newEntry);
+      state.habits = currentMoodObj.habits.map(h => ({ ...h }));
+
+      // Refresca historial, estadísticas y calendario tras confirmar el guardado.
+      renderWeeklyCalendar();
+      renderHistory();
+      renderInsights();
+      renderHabits();
+
+      if (btnViewRecommendations) btnViewRecommendations.hidden = false;
       if (window.AnisamBackend && window.AnisamBackend.getUser && window.AnisamBackend.getUser() && !result.remote) {
         showSaveFeedback('Guardado en este dispositivo. Se sincronizará con tu cuenta cuando haya conexión.', 'warn');
       } else {
@@ -534,6 +553,10 @@ function initMoodForm() {
       }
 
     });
+  }
+
+  if (btnViewRecommendations) {
+    btnViewRecommendations.addEventListener('click', () => switchScreen('screen-recommendations'));
   }
 }
 
@@ -564,7 +587,10 @@ function getMoviesForMood(moodKey) {
 
 // Render Recommendations (Screen 3)
 function renderRecommendations() {
-  const currentMood = MOOD_DATA[state.selectedMood] || MOOD_DATA.relax;
+  const latestEntry = getLatestMoodEntry();
+  const currentMoodKey = getRecommendationsMoodKey();
+  const currentMood = MOOD_DATA[currentMoodKey] || MOOD_DATA.relax;
+  const currentIntensity = latestEntry ? Number(latestEntry.intensity) : state.intensity;
   
   // Header details update
   const activeMoodIcon = document.getElementById('active-mood-icon');
@@ -573,7 +599,7 @@ function renderRecommendations() {
 
   if (activeMoodIcon) activeMoodIcon.textContent = currentMood.emoji;
   if (activeMoodTitle) activeMoodTitle.textContent = `Modo Emocional: ${currentMood.label}`;
-  if (activeMoodDesc) activeMoodDesc.textContent = `Intensidad: ${state.intensity}/100 • ${currentMood.description}`;
+  if (activeMoodDesc) activeMoodDesc.textContent = `Intensidad: ${currentIntensity}/100 • ${currentMood.description}`;
 
   // Container Elements
   const twoColLayout = document.getElementById('recs-two-col-layout');
@@ -597,7 +623,7 @@ function renderRecommendations() {
   if (cinemaSection) cinemaSection.style.display = showMovies ? 'flex' : 'none';
 
   // Render Music Cards
-  const moodSongs = getSongsForMood(state.selectedMood);
+  const moodSongs = getSongsForMood(currentMoodKey);
   if (musicGrid && showMusic) {
     // In two-col mode: stacked column. In single filter: multi-column grid via CSS class
     musicGrid.innerHTML = moodSongs.map((s, idx) => {
@@ -609,7 +635,7 @@ function renderRecommendations() {
       const albumText = s.album || 'Álbum / Sencillo';
       const vibeText = s.vibe || s.mood || 'Relajación y Concentración';
       const descText = s.description || 'Una pista ideal para relajarte, bajar el ritmo y concentrarte sin distracciones.';
-      const coverUrl = resolveCover(s, s.mood || state.selectedMood);
+      const coverUrl = resolveCover(s, s.mood || currentMoodKey);
       const isSaved = isFavoriteSaved('song', s);
 
       return `
@@ -649,7 +675,7 @@ function renderRecommendations() {
 
   // Render Movie Cards
   if (mediaGrid && showMovies) {
-    const filteredMedia = getMoviesForMood(state.selectedMood).filter(m => m.type === 'movie');
+    const filteredMedia = getMoviesForMood(currentMoodKey).filter(m => m.type === 'movie');
     mediaGrid.innerHTML = filteredMedia.map((m, idx) => {
       const titleText = m.title || m.titulo || 'Película';
       const descText = m.description || m.synopsis || 'Sin descripción disponible';
@@ -657,7 +683,7 @@ function renderRecommendations() {
       const directorText = m.director || 'No especificado';
       const actorsText = m.actors || 'Elenco estelar';
       const themeText = m.theme || m.genre || 'Entretenimiento';
-      const coverUrl = resolveCover(m, m.mood || state.selectedMood);
+      const coverUrl = resolveCover(m, m.mood || currentMoodKey);
       const isSaved = isFavoriteSaved('movie', m);
 
       return `
@@ -780,9 +806,10 @@ function initMediaGridEvents() {
     if (saveBtn) {
       const type = saveBtn.dataset.favoriteType;
       const index = Number(saveBtn.dataset.favoriteIndex);
+      const moodKey = getRecommendationsMoodKey();
       const items = type === 'song'
-        ? getSongsForMood(state.selectedMood)
-        : getMoviesForMood(state.selectedMood).filter(item => item.type === 'movie');
+        ? getSongsForMood(moodKey)
+        : getMoviesForMood(moodKey).filter(item => item.type === 'movie');
       const item = items[index];
       if (!item || (type !== 'song' && type !== 'movie')) return;
 
@@ -797,7 +824,7 @@ function initMediaGridEvents() {
         type,
         item: {
           ...item,
-          poster: resolveCover(item, item.mood || state.selectedMood)
+          poster: resolveCover(item, item.mood || moodKey)
         }
       }];
       if (!saveFavorites()) state.favorites = previousFavorites;

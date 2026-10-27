@@ -168,6 +168,10 @@
     if (typeof renderHistory === 'function') renderHistory();
     if (typeof renderInsights === 'function') renderInsights();
     if (typeof renderWeeklyCalendar === 'function') renderWeeklyCalendar();
+    const appState = currentState();
+    if (appState && appState.activeScreen === 'screen-recommendations' && typeof renderRecommendations === 'function') {
+      renderRecommendations();
+    }
   }
 
   function emitChange(entries) {

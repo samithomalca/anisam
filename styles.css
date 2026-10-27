@@ -791,6 +791,10 @@ body {
   text-align: center;
 }
 
+.save-recommendations-btn {
+  margin-top: 0.5rem;
+}
+
 /* Mensaje de confirmación al guardar el estado de ánimo */
 .save-feedback {
   margin-top: 0.85rem;
