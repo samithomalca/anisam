@@ -322,10 +322,8 @@ function renderWeeklyCalendar() {
   const badgeEl = document.getElementById('hero-current-mood-badge');
   const songTitleEl = document.getElementById('hero-song-title');
   const songDescEl = document.getElementById('hero-song-desc');
-  const songImgEl = document.getElementById('hero-song-img');
   const movieTitleEl = document.getElementById('hero-movie-title');
   const movieDescEl = document.getElementById('hero-movie-desc');
-  const movieImgEl = document.getElementById('hero-movie-img');
 
   const currentMoodObj = MOOD_DATA[state.selectedMood] || MOOD_DATA.relax;
   const songs = getSongsForMood(state.selectedMood);
@@ -339,18 +337,12 @@ function renderWeeklyCalendar() {
     badgeEl.textContent = `${currentMoodObj.emoji} Estado Actual: ${currentMoodObj.label} (${Math.round(state.intensity / 10)}/10)`;
   }
 
-  // Update hero mini preview cards (con portada local + respaldo ante fallos)
+  // Update the suggested music and movie details beside their fixed icons.
   if (songTitleEl) songTitleEl.textContent = topSong.title;
   if (songDescEl) songDescEl.textContent = `${topSong.artist || topSong.genre} • ${topSong.match || '99%'} de afinidad`;
-  if (songImgEl) {
-    setCover(songImgEl, resolveCover(topSong, topSong.mood || currentMoodObj.label), topSong.title || 'Portada musical');
-  }
 
   if (movieTitleEl) movieTitleEl.textContent = topMovie.title || topMovie.titulo;
   if (movieDescEl) movieDescEl.textContent = `${topMovie.genre || 'Cine'} • ${topMovie.duration || '2h'}`;
-  if (movieImgEl) {
-    setCover(movieImgEl, resolveCover(topMovie, topMovie.mood || currentMoodObj.label), topMovie.title || topMovie.titulo || 'Póster de película');
-  }
 
   // Render weekly pills widget (dinámico: día actual real + registros guardados)
   if (container) {
@@ -913,29 +905,6 @@ function escapeAttr(str) {
 // ==========================================================================
 // Imágenes y portadas: carga segura con respaldo elegante
 // ==========================================================================
-
-/**
- * Asigna una portada a un <img> y garantiza que, si falla la carga,
- * se muestre automáticamente la portada de respaldo (SVG local).
- */
-function setCover(imgEl, url, alt) {
-  if (!imgEl) return;
-  const safeUrl = url || FALLBACK_COVER;
-  const safeAlt = alt || 'Portada de contenido';
-
-  imgEl.setAttribute('loading', 'lazy');
-  imgEl.setAttribute('decoding', 'async');
-  if (safeAlt) imgEl.alt = safeAlt;
-  imgEl.dataset.fallback = FALLBACK_COVER;
-
-  // Si la URL cambia respecto a la actual, reinicia el estado de error
-  if (imgEl.getAttribute('src') !== safeUrl) {
-    imgEl.classList.remove('img-loading', 'img-failed');
-    imgEl.classList.add('img-loading');
-    imgEl.removeAttribute('data-failed');
-    imgEl.src = safeUrl;
-  }
-}
 
 /**
  * Manejador global para <img>: si una imagen no carga (red externa caída,

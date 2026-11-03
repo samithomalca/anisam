@@ -588,11 +588,16 @@ body {
   border: 1px solid var(--border-glass);
 }
 
-.media-preview-mini img {
+.media-preview-icon {
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
+  flex: 0 0 44px;
   border-radius: var(--radius-sm);
-  object-fit: cover;
+  background: var(--bg-glass);
+  color: var(--accent-primary);
+  font-size: 1.65rem;
 }
 
 .media-info-mini h5 {
@@ -1116,17 +1121,6 @@ body {
 
 .media-card-cover img.img-failed {
   opacity: 0;
-}
-
-/* La portada del hero también avisa mientras carga */
-.media-preview-mini img {
-  background:
-    linear-gradient(135deg, rgba(109, 148, 192, 0.2), rgba(143, 181, 217, 0.12)),
-    var(--bg-glass);
-}
-
-.media-preview-mini img.img-loading {
-  opacity: 0.4;
 }
 
 .media-card-title {
