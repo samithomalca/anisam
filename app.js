@@ -100,6 +100,167 @@ function resolveCover(item, moodKey) {
     || FALLBACK_COVER;
 }
 
+const mediaArtworkCache = new Map();
+
+function normalizeArtworkText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('en')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function getMovieTitleTokens(value) {
+  const ignoredWords = new Set([
+    'a', 'al', 'de', 'del', 'el', 'en', 'la', 'las', 'los', 'of', 'the', 'y',
+    'film', 'movie', 'pelicula'
+  ]);
+  return normalizeArtworkText(value)
+    .split(' ')
+    .filter(token => token && !ignoredWords.has(token) && !/^\d+$/.test(token));
+}
+
+function getVerifiedMovieArtwork(summary, item, searchTitle) {
+  const imageUrl = summary.thumbnail && summary.thumbnail.source;
+  const description = normalizeArtworkText(summary.description);
+  const mediaDescription = /\b(film|movie|pelicula|documental|documentary)\b/.test(description);
+  const yearMatches = !item.year
+    || description.includes(String(item.year))
+    || normalizeArtworkText(summary.title).includes(String(item.year));
+  if (!imageUrl || !mediaDescription || !yearMatches) return null;
+
+  const imageName = decodeURIComponent(imageUrl.split('/').pop().split('?')[0]);
+  if (/(^|[^a-z])logo([^a-z]|$)/i.test(imageName)) return null;
+
+  const expectedTokens = getMovieTitleTokens(searchTitle);
+  const imageTokens = new Set(getMovieTitleTokens(imageName));
+  const matchingTokens = expectedTokens.filter(token => imageTokens.has(token)).length;
+  const looksLikePoster = /\b(poster|affiche|locandina)\b/i.test(imageName);
+  const minimumMatches = Math.max(1, Math.ceil(expectedTokens.length * 0.5));
+  if (!looksLikePoster && matchingTokens < minimumMatches) return null;
+
+  return imageUrl.replace(/\/\d+px-/, '/600px-');
+}
+
+async function findSongArtwork(item) {
+  const term = [item.title, item.artist].filter(Boolean).join(' ');
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=10`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`iTunes respondió con estado ${response.status}.`);
+
+  const data = await response.json();
+  const expectedTitle = normalizeArtworkText(item.title);
+  const expectedArtist = normalizeArtworkText(item.artist).split(' ft ')[0].split(' feat ')[0];
+  const match = (data.results || []).find(result => {
+    const trackTitle = normalizeArtworkText(result.trackName);
+    const artist = normalizeArtworkText(result.artistName);
+    return (trackTitle === expectedTitle || trackTitle.startsWith(expectedTitle + ' '))
+      && (!expectedArtist || artist.includes(expectedArtist) || expectedArtist.includes(artist));
+  });
+  return match && match.artworkUrl100
+    ? match.artworkUrl100.replace(/100x100bb/, '600x600bb')
+    : null;
+}
+
+async function findMovieArtwork(item) {
+  const title = item.title || item.titulo || '';
+  const alternateTitle = title.match(/\(([^)]+)\)/);
+  const titles = Array.from(new Set([alternateTitle ? alternateTitle[1] : '', title].filter(Boolean)));
+  const languages = ['en', 'es'];
+
+  for (const language of languages) {
+    for (const searchTitle of titles) {
+      const pageTitle = searchTitle.replace(/ /g, '_');
+      const url = `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
+      const response = await fetch(url);
+      if (response.status === 404) continue;
+      if (!response.ok) throw new Error(`Wikipedia respondió con estado ${response.status}.`);
+
+      const data = await response.json();
+      const artwork = getVerifiedMovieArtwork(data, item, searchTitle);
+      if (artwork) return artwork;
+    }
+  }
+
+  for (const language of languages) {
+    const searchTerms = [
+      [titles[0], item.year, item.director, language === 'es' ? 'película' : 'film'],
+      [item.director, item.year, language === 'es' ? 'película' : 'film']
+    ].map(parts => parts.filter(Boolean).join(' '));
+    for (const searchTerm of searchTerms) {
+      const url = `https://${language}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&srnamespace=0&srlimit=3&format=json&origin=*`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Wikipedia respondió con estado ${response.status}.`);
+
+      const data = await response.json();
+      for (const result of data.query && data.query.search || []) {
+        const summaryUrl = `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(result.title.replace(/ /g, '_'))}`;
+        const summaryResponse = await fetch(summaryUrl);
+        if (summaryResponse.status === 404) continue;
+        if (!summaryResponse.ok) throw new Error(`Wikipedia respondió con estado ${summaryResponse.status}.`);
+
+        const summary = await summaryResponse.json();
+        const artwork = getVerifiedMovieArtwork(summary, item, titles[0]);
+        if (artwork) return artwork;
+      }
+    }
+  }
+
+  return null;
+}
+
+function getMediaArtwork(item, category) {
+  const key = `${category}:${item.title || item.titulo}:${item.artist || ''}:${item.year || ''}`;
+  if (!mediaArtworkCache.has(key)) {
+    const artworkPromise = (category === 'song' ? findSongArtwork(item) : findMovieArtwork(item))
+      .catch(error => {
+        console.warn(`[ANISAM] No se pudo cargar la portada de "${item.title || item.titulo}".`, error);
+        return null;
+      });
+    mediaArtworkCache.set(key, artworkPromise);
+  }
+  return mediaArtworkCache.get(key);
+}
+
+function loadMediaArtwork(container, items, category) {
+  if (!container || !container.closest('.active-screen')) return;
+  const images = container.querySelectorAll('.media-artwork-img');
+  images.forEach((image, index) => {
+    const item = items[index];
+    if (!item) return;
+    getMediaArtwork(item, category).then(url => {
+      if (!url || !image.isConnected) return;
+      image.hidden = false;
+      image.style.visibility = 'hidden';
+      image.onload = () => { image.style.visibility = 'visible'; };
+      image.onerror = () => { image.hidden = true; };
+      image.src = url;
+    });
+  });
+}
+
+function getMoodCoverColor(moodLabel) {
+  const category = getMoodCategory({ moodLabel: moodLabel || '' });
+  return MOOD_DATA[category.key]?.color || MOOD_DATA.relax.color;
+}
+
+function mediaCoverMarkup(category, title, moodLabel) {
+  const isSong = category === 'song';
+  const icon = isSong ? '🎵' : '🎬';
+  const typeLabel = isSong ? 'Música' : 'Película';
+  return `
+    <div class="media-card-cover" style="--cover-mood-color: ${getMoodCoverColor(moodLabel)};">
+      <div class="media-cover-placeholder" role="img" aria-label="${typeLabel}: portada no disponible">
+        <span class="media-cover-placeholder-icon" aria-hidden="true">${icon}</span>
+        <span>Portada no disponible</span>
+      </div>
+      <img class="media-artwork-img" alt="${escapeAttr(`Portada de ${typeLabel.toLocaleLowerCase('es')}: ${title}`)}" loading="lazy" decoding="async" hidden />
+      <span class="media-card-cover-badge">${icon} ${typeLabel}</span>
+    </div>
+  `;
+}
+
 /**
  * Devuelve los atributos <img> para una portada, con respaldo ante fallos.
  * La portada real se toma de `url` (o del respaldo si falta).
@@ -467,10 +628,6 @@ function initMoodForm() {
     moodCards.forEach(card => {
       const isSelected = card.dataset.mood === moodKey;
       card.classList.toggle('selected', isSelected);
-      if (isSelected) {
-        const moodIcon = card.querySelector('.mood-emoji');
-        if (moodIcon) moodIcon.textContent = getMoodVisualSymbol(moodKey, state.intensity);
-      }
     });
     const intensitySymbol = document.getElementById('intensity-symbol');
     if (intensitySymbol) intensitySymbol.textContent = getMoodVisualSymbol(moodKey, state.intensity);
@@ -622,9 +779,6 @@ function renderRecommendations() {
   const currentMoodSymbol = latestEntry
     ? getMoodVisualSymbol(currentMoodKey, currentIntensity)
     : '🧭';
-  const recommendationMoodBadge = latestEntry
-    ? `${currentMoodSymbol} ${currentIntensity}/100`
-    : 'Sin registro';
   
   // Header details update
   const activeMoodIcon = document.getElementById('active-mood-icon');
@@ -677,15 +831,11 @@ function renderRecommendations() {
       const albumText = s.album || 'Álbum / Sencillo';
       const vibeText = s.vibe || s.mood || 'Relajación y Concentración';
       const descText = s.description || 'Una pista ideal para relajarte, bajar el ritmo y concentrarte sin distracciones.';
-      const coverUrl = resolveCover(s, s.mood || currentMoodKey);
       const isSaved = isFavoriteSaved('song', s);
 
       return `
         <div class="media-card">
-          <div class="media-card-cover">
-            <img ${coverImgAttrs(coverUrl, titleText)} />
-            <span class="media-card-cover-badge">🎵 Música · ${recommendationMoodBadge}</span>
-          </div>
+          ${mediaCoverMarkup('song', titleText, s.mood || currentMoodKey)}
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)}${yearText}</h4>
@@ -713,6 +863,7 @@ function renderRecommendations() {
         </div>
       `;
     }).join('');
+      loadMediaArtwork(musicGrid, moodSongs, 'song');
   }
 
   // Render Movie Cards
@@ -725,15 +876,11 @@ function renderRecommendations() {
       const directorText = m.director || 'No especificado';
       const actorsText = m.actors || 'Elenco estelar';
       const themeText = m.theme || m.genre || 'Entretenimiento';
-      const coverUrl = resolveCover(m, m.mood || currentMoodKey);
       const isSaved = isFavoriteSaved('movie', m);
 
       return `
         <div class="media-card">
-          <div class="media-card-cover">
-            <img ${coverImgAttrs(coverUrl, titleText)} />
-            <span class="media-card-cover-badge">🎬 Película · ${recommendationMoodBadge}</span>
-          </div>
+          ${mediaCoverMarkup('movie', titleText, m.mood || currentMoodKey)}
           <div class="media-card-body">
             <div class="media-card-top-header">
               <h4 class="media-card-title">${escapeHtml(titleText)} (${m.year || 2023})</h4>
@@ -765,6 +912,7 @@ function renderRecommendations() {
         </div>
       `;
     }).join('');
+      loadMediaArtwork(mediaGrid, filteredMedia, 'movie');
   }
 }
 
@@ -944,6 +1092,11 @@ function setCover(imgEl, url, alt) {
  * contenedor muestre su fondo decorativo.
  */
 function handleImageError(img) {
+  if (img && img.classList.contains('media-artwork-img')) {
+    img.hidden = true;
+    return;
+  }
+
   if (!img || img.dataset.failed === 'true') {
     // La imagen de respaldo tampoco cargó: se oculta limpiamente.
     if (img) {
