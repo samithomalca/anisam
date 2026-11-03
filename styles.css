@@ -1069,28 +1069,18 @@ body {
   border-bottom: 1px solid var(--border-glass);
 }
 
-.media-cover-placeholder {
+.media-cover-icon {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
+  display: grid;
+  place-items: center;
   color: var(--text-main);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
-}
-
-.media-cover-placeholder-icon {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   line-height: 1;
+  text-shadow: 0 4px 18px var(--cover-mood-color);
 }
 
-.media-card-cover .media-artwork-img {
-  position: absolute;
-  inset: 0;
+.media-card-cover img {
   display: block;
   width: 100%;
   height: 100%;
@@ -1099,11 +1089,7 @@ body {
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.media-card-cover .media-artwork-img[hidden] {
-  display: none;
-}
-
-.media-card:hover .media-card-cover .media-artwork-img {
+.media-card:hover .media-card-cover img {
   transform: scale(1.03);
 }
 
@@ -1128,7 +1114,6 @@ body {
   pointer-events: none;
 }
 
-/* Si la imagen falla por completo, la tarjeta conserva su fondo decorativo */
 .media-card-cover img.img-failed {
   opacity: 0;
 }
