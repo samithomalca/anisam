@@ -7,8 +7,8 @@
 const initialFavorites = loadFavorites();
 const state = {
   activeScreen: 'screen-welcome',
-  selectedMood: 'feliz',
-  intensity: 90,
+  selectedMood: 'relax',
+  intensity: 30,
   activeFilter: 'all',
   habits: [],
   history: JSON.parse(localStorage.getItem('anisam_history') || '[]'),
@@ -590,16 +590,25 @@ function renderRecommendations() {
   const latestEntry = getLatestMoodEntry();
   const currentMoodKey = getRecommendationsMoodKey();
   const currentMood = MOOD_DATA[currentMoodKey] || MOOD_DATA.relax;
-  const currentIntensity = latestEntry ? Number(latestEntry.intensity) : state.intensity;
+  const savedIntensity = latestEntry ? Number(latestEntry.intensity) : NaN;
+  const currentIntensity = Number.isFinite(savedIntensity) ? savedIntensity : state.intensity;
   
   // Header details update
   const activeMoodIcon = document.getElementById('active-mood-icon');
   const activeMoodTitle = document.getElementById('active-mood-title');
   const activeMoodDesc = document.getElementById('active-mood-desc');
 
-  if (activeMoodIcon) activeMoodIcon.textContent = currentMood.emoji;
-  if (activeMoodTitle) activeMoodTitle.textContent = `Modo Emocional: ${currentMood.label}`;
-  if (activeMoodDesc) activeMoodDesc.textContent = `Intensidad: ${currentIntensity}/100 • ${currentMood.description}`;
+  if (activeMoodIcon) activeMoodIcon.textContent = latestEntry ? currentMood.emoji : '🧭';
+  if (activeMoodTitle) {
+    activeMoodTitle.textContent = latestEntry
+      ? `Modo Emocional: ${currentMood.label}`
+      : 'Estado de ánimo pendiente';
+  }
+  if (activeMoodDesc) {
+    activeMoodDesc.textContent = latestEntry
+      ? `Intensidad: ${currentIntensity}/100 • ${currentMood.description}`
+      : 'Guarda tu estado de ánimo para ver recomendaciones personalizadas.';
+  }
 
   // Container Elements
   const twoColLayout = document.getElementById('recs-two-col-layout');
