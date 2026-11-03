@@ -172,6 +172,26 @@ const MOOD_DATA = {
   }
 };
 
+function getMoodVisualSymbol(moodKey, intensity) {
+  const moodVisuals = {
+    triste: ['🌧️', '🌦️', '🌥️', '☀️', '🌈'],
+    relax: ['🫧', '🍃', '🌿', '🌱', '🌳'],
+    entretenido: ['🙂', '🙂', '😊', '😄', '🎉'],
+    energia: ['🌤️', '☀️', '🏃', '⚡', '🚀'],
+    feliz: ['🙂', '😊', '😄', '✨', '🎉']
+  };
+  const mood = MOOD_DATA[moodKey];
+  const value = Number(intensity);
+  if (!mood || !Number.isFinite(value)) return mood ? mood.emoji : '✨';
+
+  const symbolIndex = value <= 20 ? 0
+    : value <= 40 ? 1
+      : value <= 60 ? 2
+        : value <= 80 ? 3
+          : 4;
+  return moodVisuals[moodKey][symbolIndex];
+}
+
 // Nombres cortos de los días, en orden de lunes a domingo.
 // El índice 0 corresponde al lunes (la semana empieza el lunes).
 const WEEK_DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -331,7 +351,7 @@ function renderWeeklyCalendar() {
       // Día sin registro: indicador neutral. Día con registro: emoji real.
       const moodColor = entry ? (MOOD_DATA[entry.moodKey]?.color || '#8ab8e8') : 'transparent';
       const emojiContent = entry
-        ? entry.emoji
+        ? getMoodVisualSymbol(getMoodCategory(entry).key, entry.intensity)
         : EMPTY_DAY_EMOJI;
 
       const tooltip = entry
@@ -339,7 +359,7 @@ function renderWeeklyCalendar() {
           <div class="calendar-tooltip">
             <div class="tooltip-header">
               <span class="tooltip-day-badge">${day.day} ${day.dayOfMonth}${day.isToday ? ' (Hoy)' : ''}</span>
-              <strong>${entry.emoji} ${escapeHtml(entry.moodLabel)} (${entry.intensity}/100)</strong>
+              <strong>${getMoodVisualSymbol(getMoodCategory(entry).key, entry.intensity)} ${escapeHtml(entry.moodLabel)} (${entry.intensity}/100)</strong>
             </div>
             <div class="tooltip-body">
               ${entry.note ? `<p class="tooltip-note">💬 <em>"${escapeHtml(entry.note)}"</em></p>` : '<p class="tooltip-note">Sin nota adicional.</p>'}
@@ -445,8 +465,15 @@ function initMoodForm() {
   function updateMoodCardVisual(moodKey) {
     state.selectedMood = moodKey;
     moodCards.forEach(card => {
-      card.classList.toggle('selected', card.dataset.mood === moodKey);
+      const isSelected = card.dataset.mood === moodKey;
+      card.classList.toggle('selected', isSelected);
+      if (isSelected) {
+        const moodIcon = card.querySelector('.mood-emoji');
+        if (moodIcon) moodIcon.textContent = getMoodVisualSymbol(moodKey, state.intensity);
+      }
     });
+    const intensitySymbol = document.getElementById('intensity-symbol');
+    if (intensitySymbol) intensitySymbol.textContent = getMoodVisualSymbol(moodKey, state.intensity);
     document.body.setAttribute('data-active-mood', moodKey);
     renderWeeklyCalendar();
   }
@@ -455,13 +482,12 @@ function initMoodForm() {
   moodCards.forEach(card => {
     card.addEventListener('click', () => {
       const moodKey = card.dataset.mood;
-      updateMoodCardVisual(moodKey);
-
       // Set slider to midpoint of range
       const midpoint = MOOD_MIDPOINTS[moodKey] !== undefined ? MOOD_MIDPOINTS[moodKey] : 70;
       state.intensity = midpoint;
       if (intensitySlider) intensitySlider.value = midpoint;
       if (intensityVal) intensityVal.textContent = `${midpoint}/100`;
+      updateMoodCardVisual(moodKey);
       renderWeeklyCalendar();
     });
   });
@@ -479,6 +505,7 @@ function initMoodForm() {
       renderWeeklyCalendar();
     });
   }
+  updateMoodCardVisual(state.selectedMood);
 
   // Acción principal -> Guardar la entrada y actualizar historial/estadísticas
   const btnSaveMood = document.getElementById('btn-save-mood');
@@ -507,7 +534,7 @@ function initMoodForm() {
         date: new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         moodKey: state.selectedMood,
         moodLabel: currentMoodObj.label,
-        emoji: currentMoodObj.emoji,
+        emoji: getMoodVisualSymbol(state.selectedMood, state.intensity),
         intensity: state.intensity,
         note: 'Registro sin notas adicionales'
       };
@@ -549,7 +576,7 @@ function initMoodForm() {
       if (window.AnisamBackend && window.AnisamBackend.getUser && window.AnisamBackend.getUser() && !result.remote) {
         showSaveFeedback('Guardado en este dispositivo. Se sincronizará con tu cuenta cuando haya conexión.', 'warn');
       } else {
-        showSaveFeedback('¡Estado de ánimo guardado! ' + currentMoodObj.emoji + ' ' + currentMoodObj.label, 'ok');
+        showSaveFeedback('¡Estado de ánimo guardado! ' + newEntry.emoji + ' ' + currentMoodObj.label, 'ok');
       }
 
     });
@@ -592,13 +619,19 @@ function renderRecommendations() {
   const currentMood = MOOD_DATA[currentMoodKey] || MOOD_DATA.relax;
   const savedIntensity = latestEntry ? Number(latestEntry.intensity) : NaN;
   const currentIntensity = Number.isFinite(savedIntensity) ? savedIntensity : state.intensity;
+  const currentMoodSymbol = latestEntry
+    ? getMoodVisualSymbol(currentMoodKey, currentIntensity)
+    : '🧭';
+  const recommendationMoodBadge = latestEntry
+    ? `${currentMoodSymbol} ${currentIntensity}/100`
+    : 'Sin registro';
   
   // Header details update
   const activeMoodIcon = document.getElementById('active-mood-icon');
   const activeMoodTitle = document.getElementById('active-mood-title');
   const activeMoodDesc = document.getElementById('active-mood-desc');
 
-  if (activeMoodIcon) activeMoodIcon.textContent = latestEntry ? currentMood.emoji : '🧭';
+  if (activeMoodIcon) activeMoodIcon.textContent = currentMoodSymbol;
   if (activeMoodTitle) {
     activeMoodTitle.textContent = latestEntry
       ? `Modo Emocional: ${currentMood.label}`
@@ -651,7 +684,7 @@ function renderRecommendations() {
         <div class="media-card">
           <div class="media-card-cover">
             <img ${coverImgAttrs(coverUrl, titleText)} />
-            <span class="media-card-cover-badge">🎵 Relajación</span>
+            <span class="media-card-cover-badge">🎵 Música · ${recommendationMoodBadge}</span>
           </div>
           <div class="media-card-body">
             <div class="media-card-top-header">
@@ -699,7 +732,7 @@ function renderRecommendations() {
         <div class="media-card">
           <div class="media-card-cover">
             <img ${coverImgAttrs(coverUrl, titleText)} />
-            <span class="media-card-cover-badge">🎬 Película</span>
+            <span class="media-card-cover-badge">🎬 Película · ${recommendationMoodBadge}</span>
           </div>
           <div class="media-card-body">
             <div class="media-card-top-header">
@@ -1115,7 +1148,7 @@ function renderHistory() {
 
   timelineEl.innerHTML = state.history.map(item => `
     <div class="timeline-item">
-      <div class="timeline-emoji">${item.emoji}</div>
+      <div class="timeline-emoji">${getMoodVisualSymbol(getMoodCategory(item).key, item.intensity)}</div>
       <div class="timeline-details">
         <h5>${escapeHtml(item.moodLabel)} (Intensidad: ${item.intensity}/100)</h5>
         <p>${escapeHtml(item.note)}</p>
